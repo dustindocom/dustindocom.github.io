@@ -1,8 +1,8 @@
 /* Direction: phone-app column. Cream/cool-dark Level 0 palettes, one purple highlight, Inter + Space Grotesk. */
 :root{
-  --bg:#F6F1E7;--surface:#FBF8F1;--surface2:#EDE6D8;--line:#DDD4C2;
-  --text:#16140F;--muted:#6A6354;--accent:#000000;--onaccent:#F9F6EE;--hi:#6D5BE8;
-  --stage:#E4DCCB;--danger:#B3382F;
+  --bg:#FFFFFF;--surface:#FCFAF6;--surface2:#F3EEE5;--line:#E8E2D6;
+  --text:#16140F;--muted:#6A6354;--accent:#000000;--onaccent:#FDFCF9;--hi:#6D5BE8;
+  --stage:#F6F3ED;--danger:#B3382F;
   --f-body:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
   --f-head:'Space Grotesk','Inter',system-ui,sans-serif;
 }
@@ -20,9 +20,9 @@
 }
 /* the in-app Appearance setting (System / Light / Dark) wins over both of the above */
 :root[data-vt="light"]{
-  --bg:#F6F1E7;--surface:#FBF8F1;--surface2:#EDE6D8;--line:#DDD4C2;
-  --text:#16140F;--muted:#6A6354;--accent:#000000;--onaccent:#F9F6EE;--hi:#6D5BE8;
-  --stage:#E4DCCB;--danger:#B3382F;color-scheme:light;
+  --bg:#FFFFFF;--surface:#FCFAF6;--surface2:#F3EEE5;--line:#E8E2D6;
+  --text:#16140F;--muted:#6A6354;--accent:#000000;--onaccent:#FDFCF9;--hi:#6D5BE8;
+  --stage:#F6F3ED;--danger:#B3382F;color-scheme:light;
 }
 :root[data-vt="dark"]{
   --bg:#0D0F12;--surface:#161A1F;--surface2:#1F242B;--line:#2A3038;

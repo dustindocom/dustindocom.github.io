@@ -97,7 +97,7 @@ var S={
   pinned:[],
   hot:[],booting:true,sg:{items:[],active:-1,open:false},
   playing:null,isPlaying:false,prog:0,
-  vt:'system',chartL:'hot',chartG:'all',chartE:'all',chartD:'any',chartS:'any',chartM:'any',chartN:50,crateQ:'',meTab:'tapes',xCount:2341,xMuted:true,
+  vt:'light',chartL:'hot',chartG:'all',chartE:'all',chartD:'any',chartS:'any',chartM:'any',chartN:50,crateQ:'',meTab:'tapes',xCount:2341,xMuted:true,
   avatar:0,banner:0,newName:false
 };
 var CTX={};

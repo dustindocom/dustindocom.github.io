@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dustin Do Diorama</title>
+<link rel="stylesheet" href="diorama.css">
+<style>
+  /* Demo page only. On your own site you just need the .diorama element and the three scripts below. */
+  :root {
+    /* layout: one framed scene, centered, with a single quiet line of help under it */
+    --page: #eceae4;
+    --ink: #3a3a36;
+    --muted: #77756d;
+    --gold: #a9781a;
+    --font-body: ui-rounded, "SF Pro Rounded", "Nunito", "Segoe UI", system-ui, sans-serif;
+    color-scheme: light;
+  }
+  html, body { margin: 0; }
+  body {
+    background: var(--page);
+    color: var(--ink);
+    font-family: var(--font-body);
+  }
+  .stage {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: clamp(16px, 3vw, 40px) 16px 28px;
+    display: grid;
+    gap: 14px;
+  }
+  .stage .diorama {
+    border-radius: 6px;
+    box-shadow: 0 1px 2px rgba(40, 36, 20, 0.2), 0 18px 40px -18px rgba(40, 36, 20, 0.45);
+  }
+  .hint {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--muted);
+    text-align: center;
+    text-wrap: balance;
+  }
+  .hint b { color: var(--gold); font-weight: 600; }
+</style>
+</head>
+<body>
+  <main class="stage">
+    <div class="diorama" id="diorama" role="group" aria-label="A sunny diorama of rolling green hills framed in white tile, with gold balloon letters you can edit"></div>
+    <p class="hint">Hover or tap the box at the bottom of the scene to <b>edit the words</b> (up to three lines). Click a shape or the letters to bounce them. On a phone, tilt to look around and swipe sideways for a gust of wind.</p>
+  </main>
+
+  <script src="lib/three-bundle.js"></script>
+  <script src="lib/font-fredoka.js"></script>
+  <script src="diorama.js"></script>
+  <!-- The settings panel under the scene. Delete this one line to remove it for the live site. -->
+  <script src="diorama-panel.js"></script>
+</body>
+</html>
