@@ -144,3 +144,19 @@
 @media (prefers-reduced-motion: reduce) {
   .dio-sizer, .dio-field::before, .diorama canvas { transition-duration: 0.01s; }
 }
+
+/* ---- marble plaque: the scene draws the plaque, its letters and its cursor. The text area here is an
+   invisible layer over it, so typing, the I-beam pointer and phone keyboards all work as usual. ---- */
+.diorama.dio-plaque .dio-ui { transform: none; max-width: none; }
+.diorama.dio-plaque .dio-field,
+.diorama.dio-plaque .dio-field.is-open {
+  display: block; width: 100%; height: 100%; padding: 0; border: 0; border-radius: 0; background: transparent;
+}
+.diorama.dio-plaque .dio-field::before,
+.diorama.dio-plaque .dio-orb,
+.diorama.dio-plaque .dio-mirror { display: none; }
+.diorama.dio-plaque .dio-sizer { display: block; width: 100%; height: 100%; max-width: none; transition: none; }
+.diorama.dio-plaque .dio-input {
+  opacity: 1; color: transparent; caret-color: transparent; text-shadow: none; font-size: 16px; cursor: text;
+}
+.diorama.dio-plaque .dio-input::selection { background: transparent; color: transparent; }

@@ -8,7 +8,7 @@
    hex codes. Sizes and positions are measured in tiles (1 = one tile).
    Nothing below the line "END OF CONFIG" needs to be touched.
 
-   The settings panel under the scene (diorama-panel.js) changes 25 of these
+   The settings panel under the scene (diorama-panel.js) changes 38 of these
    live. When you like what you see, copy its export text and type the values
    in here to make them permanent.
    ========================================================================== */
@@ -33,7 +33,7 @@ var CONFIG = {
     groutColor: '#b7b5af',
     widthPercent: 100,      // how wide the frame is drawn, as a percent of the space it has     [panel]
     smudges: 18,            // how many smudges and fingerprints are on the tiles and grout
-    smudgeOpacity: 0.3,     // 0 = spotless, 1 = very grubby                          [panel]
+    smudgeOpacity: 0.18,     // 0 = spotless, 1 = very grubby                          [panel]
     smudgeColors: ['#e0532a', '#f0c22e']   // orange-red and yellow
   },
 
@@ -64,9 +64,16 @@ var CONFIG = {
     shadow: 0.62,           // how dark the shaded sides and shadows are (0 = flat, 1 = deep)   [panel]
     hazeFore: 0,            // atmospheric haze on each depth layer, in percent                 [panel]
     hazeMid: 15,            //                                                                  [panel]
-    hazeBack: 33,           //                                                                  [panel]
-    foreRise: 1.2,          // how much the foreground climbs as it goes back. More = the foreground fills more of the view
-    windStrength: 1.0       // 0 = perfectly still grass
+    hazeBack: 42,           //                                                                  [panel]
+    foreRise: 2.0,          // how much the foreground climbs as it goes back. More = the foreground fills more of the view
+    midHeight: -1.0,        // how high the mid-ground layer sits. Higher = it shows more above the foreground
+    backHeight: 0.0,        // how high the painted background ridge sits
+    windStrength: 1.0,      // 0 = perfectly still grass
+    grassTexture: true,     // use the grass pictures in the textures folder for the ground (false = plain shaded ground)
+    grassScale: 3,          // how many tiles one copy of the grass picture covers. Smaller = finer grain      [panel]
+    grassColor: 0.44,       // 0 = only your grass colors above, 1 = the picture's own green                    [panel]
+    grassBump: 0.85,         // how strongly the fibers catch the light                                            [panel]
+    grassDrift: 0.5         // strength of the big soft light and dark patches                                    [panel]
   },
 
   // ---------------------------------------------------------------- THE THREE FOREGROUND HILLS
@@ -83,19 +90,19 @@ var CONFIG = {
     y: 2.9,
     color: '#fff3c4',
     rayColor: '#ffdf7a',
-    rays: 12,               // how many rays in the main layer                         [panel]
+    rays: 18,               // how many rays in the main layer                         [panel]
     rays2: 9,               // how many in the second layer, which spins the other way  [panel]
     rayMin: 0.6,            // shortest a ray gets, in tiles                           [panel]
     rayMax: 9,              // longest a ray gets, in tiles                            [panel]
     rayWidth: 1.0,          // 1 = like the reference picture, 2 = fat wedges          [panel]
-    rayGlow: 1.0,           // brightness of the rays                                  [panel]
+    rayGlow: 2.7,           // brightness of the rays                                  [panel]
     raySpeed: 1.0           // how quickly rays change length, width and brightness    [panel]
   },
 
   // ---------------------------------------------------------------- CLOUDS
   clouds: {
     speed: 1.0,             // drift to the right. 0 = still                           [panel]
-    opacity: 0.9,           // how solid the puffy clouds are overall                  [panel]
+    opacity: 0.88,           // how solid the puffy clouds are overall                  [panel]
     cirrus: 9,              // thin wispy clouds, high up
     cumulus: 5              // puffy cartoon clouds, lower down
   },
@@ -109,7 +116,7 @@ var CONFIG = {
     y: 0.9,                 // height of the word block (tiles from frame center)
     z: -4.2,                // how far back the words float
     rotateMax: 15,          // each letter slowly turns up to this many degrees on all three axes   [panel]
-    rotateSpeed: 1.0,       // how quickly letters drift between rotations                           [panel]
+    rotateSpeed: 2.6,       // how quickly letters drift between rotations                           [panel]
     color: [1.0, 0.68, 0.22], // gold (red, green, blue from 0 to 1)
     roughness: 0.13,        // 0 = mirror, 0.4 = brushed
     shine: 1.45,            // strength of reflections
@@ -128,10 +135,11 @@ var CONFIG = {
   shapes: {
     count: 11,              // how many shapes in total                                [panel]
     minSize: 1.5,           // height of the smallest shapes, in tiles                 [panel]
-    maxScale: 2.3,          // the largest shapes are this many times the smallest     [panel]
-    seed: 7,                // the layout. Same number = same layout every visit       [panel]
-    fuzz: 0.16,             // length of the fur, in tiles. 0 = smooth                 [panel]
-    furWidth: 0.38,         // thickness of each strand. 0.2 = fine hair, 0.6 = chunky  [panel]
+    maxScale: 2.5,          // the largest shapes are this many times the smallest     [panel]
+    seed: 6117,                // the layout. Same number = same layout every visit       [panel]
+    fuzz: 0.1,             // length of the fur, in tiles. 0 = smooth                 [panel]
+    furDensity: 15,         // strands per tile. Fewer = bigger, chunkier tufts          [panel]
+    furWidth: 0.46,         // thickness of each strand. 0.2 = fine hair, 0.6 = chunky  [panel]
     richness: 1.2,          // color strength. 1 = as listed below, 1.5 = vivid        [panel]
     nearest: 2.6,           // closest a shape may sit to the frame
     types: ['cube', 'sphere', 'pyramid', 'ring', 'cylinder', 'cone'],
@@ -149,7 +157,20 @@ var CONFIG = {
 
   // ---------------------------------------------------------------- TEXT BOX + CARET
   ui: {
+    plaque: true,              // true = the text box is a marble and bronze plaque on the frame's bottom edge  [panel]
     caretAlwaysVisible: false  // true = the gold block caret blinks even when the text box is not in use
+  },
+
+  // ---------------------------------------------------------------- MARBLE PLAQUE (when ui.plaque is true)
+  plaque: {
+    letterSize: 0.21,       // height of a capital letter on the plaque, in tiles               [panel]
+    restWidth: 3.0,         // width of the bronze plate when nobody is typing
+    maxWidth: 12,           // the widest the plate may get; letters shrink to stay inside
+    padX: 0.5,              // space between the plate's sides and the words
+    padY: 0.34,             // space above and below the words
+    marble: 0.2,            // width of the white marble border around the plate
+    depth: 0.5,             // how deep the marble block is, as a share of the frame's inner lip
+    scale: 0.82             // overall size of the plaque (plate, border, trim, bolts), not the letters
   },
 
   // ---------------------------------------------------------------- PERFORMANCE
@@ -160,10 +181,10 @@ var CONFIG = {
     desktop: {
       pixelRatio: 2,        // sharpness cap. 1 = fastest, 2 = crisp on retina screens
       antialias: true,      // smooth edges
-      grassBlades: true,    // individual blades of grass. false = soft shaded grass only   [panel]
+      grassBlades: false,   // individual blades of grass. false = the grass picture only    [panel]
       bladeCount: 30000,    // number of blades                                              [panel]
       flowers: 520,
-      bloom: true,          // soft glow on the sun and gold highlights                     [panel]
+      bloom: false,         // soft glow on the sun and gold highlights                     [panel]
       sparkles: 16,         // twinkles on the letters
       fuzzLayers: 8,        // layers the fur is drawn in. More = fuller fur, slower. 0 = flat velvet shading only
       letterDetail: 46      // smoothness of the balloon letters (30 = chunky, 60 = very smooth)
@@ -171,7 +192,7 @@ var CONFIG = {
     mobile: {
       pixelRatio: 1.5,
       antialias: true,
-      grassBlades: true,
+      grassBlades: false,
       bladeCount: 12000,
       flowers: 260,
       bloom: false,
@@ -516,6 +537,22 @@ function setSmudgeOpacity(v) { F.smudgeOpacity = clamp(v, 0, 1); for (var i = 0;
 // Background: a flat painted strip of very low hills, the haziest.
 var HAZE = { fore: { value: LOOK.hazeFore / 100 }, mid: { value: LOOK.hazeMid / 100 }, back: { value: LOOK.hazeBack / 100 } };
 var SHADOW = { value: LOOK.shadow };
+// The putting-green ground: a fine grass picture, a matching bump picture for the fibers, and a big soft drift pattern.
+var GRASS = { col: { value: null }, bump: { value: null }, drift: { value: null }, on: { value: 0 }, set: { value: new T.Vector4(LOOK.grassScale, LOOK.grassColor, LOOK.grassBump, LOOK.grassDrift) } };
+(function loadGrass() {
+  var src = window.DIORAMA_TEXTURES, left = 3;
+  if (!LOOK.grassTexture || !src || !src.color || !src.bump || !src.drift) return;
+  function load(key, slot, srgb) {
+    var img = new Image();
+    img.onload = function () {
+      var t = new T.Texture(img); t.wrapS = t.wrapT = T.RepeatWrapping; t.colorSpace = srgb ? T.SRGBColorSpace : T.NoColorSpace;
+      t.minFilter = T.LinearMipmapLinearFilter; t.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy()); t.needsUpdate = true;
+      slot.value = t; if (--left === 0) GRASS.on.value = 1;
+    };
+    img.src = src[key];
+  }
+  load('color', GRASS.col, true); load('bump', GRASS.bump, false); load('drift', GRASS.drift, false);
+})();
 var FORE_END = 25, MID_NEAR = 31, MID_FAR = 62, BACK_Z = -96;   // distances into the scene
 
 function hillBump(x, z, h) {
@@ -532,7 +569,7 @@ function foreY(x, z) {
 function midY(x, z) {
   var d = -z;
   var rise = smooth(MID_NEAR, MID_NEAR + 15, d);   // a plain that climbs gently out from behind the foreground, then rolls
-  var y = -2.9 + (d - 40) * 0.03 + (Math.sin(x * 0.075 + 0.9) * 0.8 + Math.sin(x * 0.135 - 1.1) * 0.3 + Math.cos(z * 0.12 + x * 0.03) * 0.22) * rise;
+  var y = LOOK.midHeight + (d - 40) * 0.03 + (Math.sin(x * 0.075 + 0.9) * 0.5 + Math.sin(x * 0.135 - 1.1) * 0.2 + Math.cos(z * 0.12 + x * 0.03) * 0.15) * rise;
   return y - (1 - rise) * 2.3 - smooth(MID_FAR - 8, MID_FAR, d) * 7;
 }
 function groundY(x, z) { return -z < FORE_END + 5.75 ? foreY(x, z) : midY(x, z); }
@@ -568,16 +605,23 @@ function groundMaterial(haze) {
     uniforms: {
       uTime: U.uTime, uDetail: U.uDetail, uHazeColor: U.uHazeColor, uHazeAmt: haze, uPointer: U.uPointer, uGust: U.uGust,
       uDeep: { value: color(LOOK.grassDeep) }, uMid: { value: color(LOOK.grassMid) }, uLight: { value: color(LOOK.grassLight) },
+      uGrassCol: GRASS.col, uGrassBump: GRASS.bump, uGrassDrift: GRASS.drift, uGrassOn: GRASS.on, uGrass: GRASS.set,
       uLightDir: { value: keyDir }, uBlobs: SHADE.uBlobs, uBlobCount: SHADE.uBlobCount, uShadowDir: SHADE.uShadowDir, uShadow: SHADE.uShadow, uFront: { value: LIP_BACK }
     },
     defines: { MAX_BLOBS: MAX_BLOBS },
     vertexShader: 'varying vec3 vW; varying vec3 vN; void main(){ vW = position; vN = normal; gl_Position = projectionMatrix * viewMatrix * vec4(position, 1.0); }',
     fragmentShader: [
       'varying vec3 vW; varying vec3 vN;',
+      'uniform sampler2D uGrassCol, uGrassBump, uGrassDrift; uniform float uGrassOn; uniform vec4 uGrass;',
       'uniform sampler2D uDetail; uniform float uTime; uniform vec3 uDeep, uMid, uLight, uLightDir, uPointer; uniform vec4 uGust; uniform float uFront;',
       GLSL_HAZE, GLSL_SHADE,
       'void main() {',
       '  vec3 n = normalize(vN); vec2 p = vW.xz;',
+      '  vec2 gu = p / uGrass.x, gu2 = vec2(p.y, -p.x) / (uGrass.x * 2.7) + 0.37;',   // the picture at two sizes and angles, so its repeat never lines up
+      '  if (uGrassOn > 0.5) {',                                                        // tiny fibers tilt the surface, so they catch the sun
+      '    float e = 1.0 / 512.0, h0 = texture2D(uGrassBump, gu).r;',
+      '    n = normalize(n - vec3(texture2D(uGrassBump, gu + vec2(e, 0.0)).r - h0, 0.0, texture2D(uGrassBump, gu + vec2(0.0, e)).r - h0) * 2.6 * uGrass.z);',
+      '  }',
       '  float pat = texture2D(uDetail, p * 0.033).r;',
       '  float mid = texture2D(uDetail, p * 0.17 + 0.37).b;',
       '  float fuzz = texture2D(uDetail, p * vec2(1.7, 0.95)).g;',
@@ -586,6 +630,14 @@ function groundMaterial(haze) {
       '  float tone = pat * 0.62 + mid * 0.13 + fuzz * 0.12 + fine * 0.06 + wave * 0.07;',
       '  vec3 c = mix(uDeep, uMid, smoothstep(0.22, 0.55, tone));',
       '  c = mix(c, uLight, smoothstep(0.5, 0.92, tone));',
+      '  if (uGrassOn > 0.5) {',
+      '    vec3 tx = mix(texture2D(uGrassCol, gu).rgb, texture2D(uGrassCol, gu2).rgb, 0.4);',
+      '    float detail = dot(tx, vec3(0.3, 0.6, 0.1)) / 0.13;',                         // the picture's light and dark, around 1.0
+      '    vec3 tinted = mix(uMid, uLight, 0.3) * mix(1.0, detail, 0.85);',             // your grass colors, with the picture's grain
+      '    c = mix(tinted, tx * 2.6, uGrass.y) * (1.0 + wave * 0.05);',
+      '    float drift = texture2D(uGrassDrift, p / (uGrass.x * 7.3) + 0.11).r + texture2D(uGrassDrift, vec2(-p.y, p.x) / (uGrass.x * 17.0)).r - 1.0;',
+      '    c *= 1.0 + drift * 2.2 * uGrass.w;',
+      '  }',
       '  c *= slopeLight(smoothstep(0.45, 0.86, dot(n, uLightDir) * 0.5 + 0.5));',   // hillsides turned from the sun go dark
       '  vec3 v = normalize(cameraPosition - vW);',
       '  c += uLight * pow(1.0 - max(dot(n, v), 0.0), 3.0) * 0.14;',
@@ -621,19 +673,19 @@ buildTerrain(MID_NEAR, MID_FAR, 90, 30, 1.0, HAZE.mid, 2);
 (function buildBackdrop() {
   var mat = new T.ShaderMaterial({
     alphaToCoverage: true,
-    uniforms: { uMid: { value: color(LOOK.grassMid) }, uLight: { value: color(LOOK.grassLight) }, uDeep: { value: color(LOOK.grassDeep) }, uHazeColor: U.uHazeColor, uHazeAmt: HAZE.back, uShadow: SHADOW },
+    uniforms: { uMid: { value: color(LOOK.grassMid) }, uLight: { value: color(LOOK.grassLight) }, uDeep: { value: color(LOOK.grassDeep) }, uHazeColor: U.uHazeColor, uHazeAmt: HAZE.back, uShadow: SHADOW, uBackH: { value: LOOK.backHeight } },
     vertexShader: 'varying vec2 vP; void main(){ vec4 w = modelMatrix * vec4(position, 1.0); vP = w.xy; gl_Position = projectionMatrix * viewMatrix * w; }',
     fragmentShader: [
-      'varying vec2 vP; uniform vec3 uMid, uLight, uDeep, uHazeColor; uniform float uHazeAmt, uShadow;',
+      'varying vec2 vP; uniform vec3 uMid, uLight, uDeep, uHazeColor; uniform float uHazeAmt, uShadow, uBackH;',
       'void main() {',
       '  float x = vP.x, y = vP.y;',
-      '  float r1 = 2.1 + sin(x * 0.043 + 0.6) * 0.95 + sin(x * 0.097 + 2.0) * 0.3 + sin(x * 0.019 + 4.0) * 0.55;',   // the far ridge line
-      '  float r2 = -0.4 + sin(x * 0.036 + 2.7) * 0.75 + sin(x * 0.081 + 0.4) * 0.28;',                                // a nearer swell
+      '  float r1 = uBackH + sin(x * 0.043 + 0.6) * 0.45 + sin(x * 0.097 + 2.0) * 0.15 + sin(x * 0.019 + 4.0) * 0.25;',   // the far ridge line
+      '  float r2 = uBackH - 0.9 + sin(x * 0.036 + 2.7) * 0.3 + sin(x * 0.081 + 0.4) * 0.12;',                                // a nearer swell
       '  float e = fwidth(y) * 1.3 + 0.001;',
       '  float alpha = 1.0 - smoothstep(r1 - e, r1 + e, y);',
       '  if (alpha < 0.02) discard;',
-      '  float s1 = cos(x * 0.043 + 0.6) * 0.041 + cos(x * 0.097 + 2.0) * 0.029;',                                      // slope: positive climbs to the right
-      '  float s2 = cos(x * 0.036 + 2.7) * 0.027 + cos(x * 0.081 + 0.4) * 0.023;',
+      '  float s1 = cos(x * 0.043 + 0.6) * 0.019 + cos(x * 0.097 + 2.0) * 0.015;',                                      // slope: positive climbs to the right
+      '  float s2 = cos(x * 0.036 + 2.7) * 0.011 + cos(x * 0.081 + 0.4) * 0.01;',
       '  vec3 far = mix(uMid, uLight, 0.42) * (1.0 - uShadow * 0.3 * smoothstep(-0.01, 0.04, -s1));',
       '  vec3 near = mix(uMid, uLight, 0.2) * (1.0 - uShadow * 0.34 * smoothstep(-0.01, 0.04, -s2));',
       '  vec3 c = mix(far, near, 1.0 - smoothstep(r2 - e, r2 + e, y));',
@@ -839,8 +891,8 @@ var sunMesh = (function buildSun() {
       '  float grow = wander(id * 17.31 + t * 0.21), wide = wander(id * 7.77 + 40.0 + t * 0.33), bright = wander(id * 3.3 + 90.0 + t * 0.45);',
       '  float len = mix(uLen.x, uLen.y, pow(grow, 1.7)) * reach, r0 = 0.05, u = (r - r0) / max(len, 0.002);',
       '  float halfBase = r0 * tan(min(seg * 0.34 * uWidth * (0.3 + 1.2 * wide), 1.2));',
-      '  float hw = halfBase * max(1.0 - u, 0.0), soft = hw * 0.75 + 0.0025;',
-      '  float ray = (1.0 - smoothstep(hw - soft, hw + soft, abs(r * sin(da)))) * smoothstep(-0.02, 0.1, u) * (1.0 - smoothstep(0.5, 1.0, u));',
+      '  float hw = halfBase * max(1.0 - u, 0.0), soft = hw * 1.5 + 0.006;',
+      '  float ray = (1.0 - smoothstep(hw - soft, hw + soft, abs(r * sin(da)))) * smoothstep(-0.05, 0.3, u) * (1.0 - smoothstep(0.2, 1.0, u));',
       '  return ray * (0.06 + 0.94 * bright * bright) * uGlow;',
       '}',
       'void main() {',
@@ -901,12 +953,12 @@ var clouds = [], CLOUDS = CONFIG.clouds;
   // and smaller puffs trailing off to the left.
   function cumulusTexture(seed) {
     var Wc = 512, Hc = 256, c = document.createElement('canvas'); c.width = Wc; c.height = Hc;
-    var x = c.getContext('2d'), r = rng(seed * 313 + 5), base = 200, puffs = [], i, n = 15, g;
+    var x = c.getContext('2d'), r = rng(seed * 313 + 5), base = 200, puffs = [], i, n = 11 + ((r() * 7) | 0), g, pw = 0.9 + r() * 0.9, tall = 0.75 + r() * 0.5;
     for (i = 0; i < n; i++) {     // a row of overlapping billows along the flat base, growing toward the right
-      var t = i / (n - 1), rad = lerp(15, 68, Math.pow(t, 1.35)) * (0.88 + r() * 0.26);
+      var t = i / (n - 1), rad = lerp(15, 68, Math.pow(t, pw)) * (0.8 + r() * 0.4);
       puffs.push([lerp(58, 400, Math.pow(t, 0.8)) + (r() - 0.5) * 8, base - rad * 0.58, rad]);
     }
-    puffs.push([322 + r() * 22, base - 104 - r() * 12, 50 + r() * 9], [396 + r() * 12, base - 96 - r() * 8, 44 + r() * 8], [258 + r() * 18, base - 76 - r() * 8, 38 + r() * 8]);
+    for (i = 0, n = 2 + ((r() * 3) | 0); i < n; i++) puffs.push([lerp(250, 410, r()), base - lerp(70, 110, r()) * tall, lerp(34, 58, r())]);   // the billowing head, different on every cloud
     puffs.push([40, base - 7, 12], [24, base - 5, 8]);
     for (i = 0; i < puffs.length; i++) {          // the white body, with soft edges
       var p = puffs[i]; g = x.createRadialGradient(p[0], p[1], 0, p[0], p[1], p[2]);
@@ -942,13 +994,15 @@ var clouds = [], CLOUDS = CONFIG.clouds;
     m.position.set(i % 3 === 0 ? -62 + r() * 44 : (i / nC * 2 - 1) * 60 + (r() - 0.5) * 14, 9.5 + r() * 6.5, -62 - r() * 16);
     m.renderOrder = -7 + i * 0.01; scene.add(m); clouds.push({ mesh: m, speed: (0.22 + r() * 0.2) * CALM, push: 0, kind: 0 });   // drawn before the sun, so the sun shines through the wisps
   }
-  var puffy = [cumulusTexture(1), cumulusTexture(2), cumulusTexture(3)], nP = CLOUDS.cumulus | 0;
+  // every puffy cloud gets its own shape, a size from 35% to 110% of normal, and a speed within 40% of normal
+  var nP = CLOUDS.cumulus | 0, puffy = [];
+  for (i = 0; i < Math.min(nP, 6); i++) puffy.push(cumulusTexture(i * 7 + 1));
   for (i = 0; i < nP; i++) {
-    w = 15 + r() * 10; mat = new T.MeshBasicMaterial({ map: puffy[i % 3], transparent: true, depthWrite: false });
+    w = 22 * lerp(0.35, 1.1, r()); mat = new T.MeshBasicMaterial({ map: puffy[i % puffy.length], transparent: true, depthWrite: false });
     mat.color.setRGB(1.32, 1.32, 1.32); mat.opacity = CLOUDS.opacity;
-    m = new T.Mesh(new T.PlaneGeometry(w, w * 0.5), mat);
+    m = new T.Mesh(new T.PlaneGeometry(w, w * lerp(0.42, 0.6, r())), mat);
     m.position.set(((i + 0.5) / nP * 2 - 1) * 58 + (r() - 0.5) * 16, 5.4 + r() * 3.4, -44 - i * 3.2 - r() * 2);
-    m.renderOrder = -3 + i * 0.01; scene.add(m); clouds.push({ mesh: m, speed: (0.5 + r() * 0.3) * CALM, push: 0, kind: 1 });
+    m.renderOrder = -3 + i * 0.01; scene.add(m); clouds.push({ mesh: m, speed: 0.62 * lerp(0.6, 1.4, r()) * CALM, push: 0, kind: 1 });
   }
 })();
 
@@ -995,7 +1049,7 @@ function shapeGeo(type) {
 // The fuzzy look: a velvety, cuddly surface. The body is shaded softly with a clear dark side,
 // then a few thin "shells" just outside it carry short tufts, which gives the fluffy outline.
 var M = CONFIG.motion, SH = CONFIG.shapes, shapes = [], shapeMeshes = [];
-var FUZZ = { len: { value: SH.fuzz }, width: { value: SH.furWidth }, rich: { value: SH.richness }, grain: { value: IS_TOUCH ? 17 : 24 } };
+var FUZZ = { len: { value: SH.fuzz }, width: { value: SH.furWidth }, rich: { value: SH.richness }, grain: { value: SH.furDensity * (IS_TOUCH ? 0.85 : 1) } };
 function fuzzMaterial(col, shell, size, haze) {
   return new T.ShaderMaterial({
     uniforms: {
@@ -1021,7 +1075,7 @@ function fuzzMaterial(col, shell, size, haze) {
       'void main() {',
       // fur: space is divided into little cells with one strand in each. Higher layers keep a thinner core of the strand,
       // so every strand tapers to a tip, and each layer is nudged downward so the fur droops a little.
-      '  vec3 q = (vO + vec3(0.0, uShell * uFuzz * 0.7, 0.0)) * uGrain, cell = floor(q);',
+      '  vec3 q = mat3(0.80, 0.36, -0.48, -0.60, 0.48, -0.64, 0.0, 0.80, 0.60) * (vO + vec3(0.0, uShell * uFuzz * 0.7, 0.0)) * uGrain, cell = floor(q);',   // the strand grid is turned off-axis, so flat faces never line up with it (no rings)
       '  float g = fh(cell + 7.3);',
       '  vec3 off = fract(q) - 0.5 - (vec3(fh(cell), fh(cell + 3.1), fh(cell + 5.7)) - 0.5) * 0.45;',
       '  if (uShell > 0.0 && length(off) > uFurW * (1.05 - uShell * 0.8) * (0.7 + 0.6 * g)) discard;',
@@ -1058,6 +1112,7 @@ function makeShape(spec) {
   var o = {
     group: group, mesh: mesh, mats: mats, x: spec.x, z: spec.z, size: spec.size, baseY: baseY, foot: spec.size * (spec.type === 'ring' ? 0.4 : spec.type === 'sphere' ? 0.42 : 0.55),
     squash: new Spring(170, 8.5), leanX: new Spring(85, 9), leanZ: new Spring(85, 9), shiver: new Spring(300, 9),
+    offX: new Spring(26, 5.5), offZ: new Spring(26, 5.5), spin: new Spring(30, 5), leanAmt: 1, cower: 0.07, smush: 0.36, jump: 1, bounce: 0.34, kickX: 0, kickZ: 0, kickSpin: 0,
     y: 0, vy: 0, air: false, press: 0, hover: false, awayX: 0, awayZ: 0, ph: shapes.length * 1.7 + 0.4,
     tiltX: Math.atan2(gn[2], gn[1]) * 0.5, tiltZ: -Math.atan2(gn[0], gn[1]) * 0.5
   };
@@ -1111,37 +1166,58 @@ function setFuzzLayers(n) {   // how many of the fuzz layers are drawn (fewer = 
 }
 rebuildShapes();
 
+// Every reaction is a little different. A hover picks one of a few "startles"; a click rolls its own
+// squish depth, wind-up time, jump height, jump direction, and sometimes a spin or an extra bounce.
+function rnd(a, b) { return a + Math.random() * (b - a); }
 function startleShape(o, fromX, fromZ) {
   var dx = o.x - fromX, dz = o.z - fromZ, l = Math.sqrt(dx * dx + dz * dz) || 1;
   if (l < 0.15) { dx = 0; dz = -1; l = 1; }
   o.awayX = dx / l; o.awayZ = dz / l;
-  o.shiver.v += (Math.random() < 0.5 ? -1 : 1) * 7;
-  o.squash.v -= 0.9;
+  o.leanAmt = rnd(0.6, 1.5); o.cower = rnd(0.03, 0.12);
+  var kind = (Math.random() * 4) | 0, side = Math.random() < 0.5 ? -1 : 1;
+  if (kind === 0) { o.shiver.v += side * rnd(8, 12); o.squash.v -= 0.6; }                                   // a quick shiver
+  else if (kind === 1) { o.squash.v -= rnd(1.6, 2.6); o.shiver.v += side * 3; }                              // a ducking flinch
+  else if (kind === 2) { o.squash.v += rnd(1.4, 2.2); o.shiver.v += side * rnd(4, 7); o.spin.v += side * rnd(1, 2.5); }  // a startled stretch and twist
+  else if (!o.air && o.press <= 0) { o.vy = rnd(1.2, 2.2); o.air = true; o.bounce = 0.2; o.shiver.v += side * 5; }      // a tiny jump of fright
+  else o.shiver.v += side * 9;
 }
-function pressShape(o) { if (o.press <= 0 && !o.air) o.press = 0.11; }
+function pressShape(o) {
+  if (o.press > 0 || o.air) return;
+  o.press = rnd(0.08, 0.2);                        // how long it winds up
+  o.smush = rnd(0.22, 0.52);                       // how far it squishes down first
+  o.jump = rnd(0.7, 1.45);                         // how high it goes
+  o.bounce = Math.random() < 0.3 ? 0.55 : rnd(0.25, 0.4);   // now and then, a springier landing with extra bounces
+  var a = rnd(0, 6.283), far = Math.random() < 0.25 ? 0 : rnd(1.2, 3.4);   // one time in four it goes straight up
+  o.kickX = Math.cos(a) * far; o.kickZ = Math.sin(a) * far;
+  o.kickSpin = Math.random() < 0.4 ? (Math.random() < 0.5 ? -1 : 1) * rnd(3, 9) : 0;
+}
 function updateShapes(dt, t) {
   for (var i = 0; i < shapes.length; i++) {
     var o = shapes[i];
-    o.squash.t = o.hover ? -0.07 : 0;
-    o.leanX.t = o.hover ? o.awayX * M.hoverLean : 0;
-    o.leanZ.t = o.hover ? o.awayZ * M.hoverLean : 0;
+    o.squash.t = o.hover ? -o.cower : 0;
+    o.leanX.t = o.hover ? o.awayX * M.hoverLean * o.leanAmt : 0;
+    o.leanZ.t = o.hover ? o.awayZ * M.hoverLean * o.leanAmt : 0;
     if (o.press > 0) {                       // squish down, then let go
-      o.press -= dt; o.squash.t = -0.36;
-      if (o.press <= 0) { o.vy = M.hopHeight * Math.sqrt(Math.max(1, o.size / 1.6)); o.air = true; o.squash.v += 5; }
+      o.press -= dt; o.squash.t = -o.smush;
+      if (o.press <= 0) {
+        o.vy = M.hopHeight * o.jump * Math.sqrt(Math.max(1, o.size / 1.6)); o.air = true; o.squash.v += 3 + o.smush * 8;
+        o.offX.v += o.kickX; o.offZ.v += o.kickZ; o.spin.v += o.kickSpin;          // off it goes, in this jump's direction
+        o.leanX.v += o.kickX * 0.5; o.leanZ.v += o.kickZ * 0.5;                    // leaning into the jump
+      }
     }
     if (o.air) {                             // the soft hop and landing
       o.vy -= M.gravity * dt; o.y += o.vy * dt;
       if (o.y <= 0) {
         o.y = 0;
-        if (o.vy < -1.3) { o.squash.v += Math.max(o.vy, -6) * 0.85; o.vy = -o.vy * 0.34; }
+        if (o.vy < -1.3) { o.squash.v += Math.max(o.vy, -6) * 0.85; o.vy = -o.vy * o.bounce; o.shiver.v += rnd(-3, 3); }
         else { o.vy = 0; o.air = false; }
       }
     }
     var sq = o.squash.step(dt) + Math.sin(t * 1.25 + o.ph) * 0.014 * CALM;
-    var sy = clamp(1 + sq, 0.45, 1.6), sxz = 1 / Math.sqrt(sy);
-    o.group.position.y = o.baseY + o.y;
+    var sy = clamp(1 + sq, 0.4, 1.7), sxz = 1 / Math.sqrt(sy);
+    o.group.position.set(o.x + o.offX.step(dt), o.baseY + o.y, o.z + o.offZ.step(dt));   // it drifts out with the jump, then settles back home
     o.group.scale.set(sxz, sy, sxz);
-    o.group.rotation.set(o.tiltX + o.leanZ.step(dt), 0, o.tiltZ - o.leanX.step(dt) + o.shiver.step(dt) * 0.12);
+    o.group.rotation.set(o.tiltX + o.leanZ.step(dt), o.spin.step(dt), o.tiltZ - o.leanX.step(dt) + o.shiver.step(dt) * 0.12);
   }
 }
 
@@ -1559,6 +1635,7 @@ function syncCaret() {
 }
 // Sizes the box: one short empty line when resting, exactly as big as its text when open.
 function fitBox() {
+  if (CONFIG.ui.plaque) { field.classList.remove('is-open'); sizer.style.width = ''; sizer.style.height = ''; return; }   // the plaque draws itself
   var open = boxHover || document.activeElement === input;
   field.classList.toggle('is-open', open);
   mirror.textContent = input.value + (/\n$/.test(input.value) || !input.value ? '​' : '');
@@ -1578,7 +1655,7 @@ function syncText() {
 input.addEventListener('input', syncText);
 input.addEventListener('focus', function () {
   root.classList.add('is-editing'); justFocused = true; fitBox();
-  requestAnimationFrame(function () { try { input.select(); } catch (e) {} syncCaret(); });
+  requestAnimationFrame(function () { try { if (CONFIG.ui.plaque) input.setSelectionRange(input.value.length, input.value.length); else input.select(); } catch (e) {} syncCaret(); });
 });
 input.addEventListener('mouseup', function (e) { if (justFocused) { e.preventDefault(); justFocused = false; } });
 input.addEventListener('blur', function () { root.classList.remove('is-editing'); justFocused = false; input.scrollTop = 0; input.scrollLeft = 0; fitBox(); syncCaret(); });
@@ -1589,6 +1666,266 @@ input.addEventListener('keydown', function (e) {
 field.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse') { boxHover = true; fitBox(); } });
 field.addEventListener('pointerleave', function () { boxHover = false; fitBox(); });
 document.addEventListener('selectionchange', function () { if (document.activeElement === input) syncCaret(); });
+
+// ---------------------------------------------------------------- the marble plaque (the text box, dressed up)
+// A block of white marble sitting on the frame's inner ledge, its face flush with the tiles. On it, a dark
+// bronze plate with notched corners, a raised gold trim, four gold bolts, and raised gold serif letters.
+// At rest it shows only a blinking gold block cursor. Click or tap it to reveal and edit the words.
+// The size follows the words, on loose springs, so it stretches and settles with a little bounce.
+var PF = window.DIORAMA_PLAQUE_FONT, PQ = CONFIG.plaque, plaque = null;
+var GLSL_NOISE3 = [
+  'float pqh(vec3 p) { p = fract(p * 0.3183099 + vec3(0.1, 0.2, 0.3)); p *= 17.0; return fract(p.x * p.y * p.z * (p.x + p.y + p.z)); }',
+  'float pqn(vec3 x) { vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);',
+  '  return mix(mix(mix(pqh(i), pqh(i + vec3(1, 0, 0)), f.x), mix(pqh(i + vec3(0, 1, 0)), pqh(i + vec3(1, 1, 0)), f.x), f.y),',
+  '             mix(mix(pqh(i + vec3(0, 0, 1)), pqh(i + vec3(1, 0, 1)), f.x), mix(pqh(i + vec3(0, 1, 1)), pqh(i + vec3(1, 1, 1)), f.x), f.y), f.z); }',
+  'float fbm3(vec3 p) { return pqn(p) * 0.5 + pqn(p * 2.03) * 0.3 + pqn(p * 4.1) * 0.2; }'
+].join('\n');
+var CAP_LINE = function (max) { return 'outgoingLight *= min(1.0, ' + max.toFixed(2) + ' / max(max(outgoingLight.r, outgoingLight.g), max(outgoingLight.b, 0.001)));\n#include <opaque_fragment>'; };
+
+if (PF) plaque = (function buildPlaque() {
+  var P = { group: new T.Group(), letters: [], dying: [], open: false, clock: 0, sel: [0, 0], em: 0, cursorX: new Spring(420, 34), cursorY: new Spring(420, 34),
+    w: new Spring(110, 7.5, PQ.restWidth * PQ.scale), h: new Spring(130, 8.5, 1), lastW: PQ.restWidth * PQ.scale, lastH: 1, layoutLines: [], lineH: 0, cap: 0 };
+  var depth = LIP_BACK * PQ.depth, PUPM = PF.unitsPerEm, PCAP = PF.capHeight / PUPM;
+  P.group.position.set(0, -OH, 0); P.group.visible = false; scene.add(P.group);
+
+  // white marble, with soft grey veins that stay put however the block stretches
+  var mGeo = new T.BoxGeometry(1, 1, 1); mGeo.translate(0, 0.5, -0.5);
+  var marbleMat = new T.MeshStandardMaterial({ color: 0xffffff, roughness: 0.16, metalness: 0, envMapIntensity: 1 });
+  marbleMat.onBeforeCompile = function (sh) {
+    sh.vertexShader = 'varying vec3 vMW;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\nvMW = (modelMatrix * vec4(transformed, 1.0)).xyz;');
+    sh.fragmentShader = 'varying vec3 vMW;\n' + GLSL_NOISE3 + '\n' + sh.fragmentShader
+      .replace('#include <color_fragment>', [
+        '#include <color_fragment>',
+        '{ vec3 q = vMW * vec3(1.6, 2.1, 1.6); float n = fbm3(q);',
+        '  float vein = 1.0 - smoothstep(0.0, 0.08, abs(sin(q.x * 1.2 + q.y * 0.8 + n * 7.0)));',
+        '  float fine = 1.0 - smoothstep(0.0, 0.03, abs(sin(q.x * 3.1 - q.y * 2.3 + fbm3(q * 2.3 + 4.0) * 9.0)));',
+        '  diffuseColor.rgb *= mix(vec3(0.5, 0.496, 0.488) * (0.96 + 0.08 * n), vec3(0.11, 0.11, 0.125), clamp(vein * 0.85 + fine * 0.5, 0.0, 1.0)); }'
+      ].join('\n'))
+      .replace('#include <opaque_fragment>', CAP_LINE(1.7));
+  };
+  P.marble = new T.Mesh(mGeo, marbleMat); P.group.add(P.marble);
+
+  // the bronze plate: one flat panel whose notched corners, gold trim, bumps and bolts are all drawn by its shader
+  var plateSize = { value: new T.Vector2(PQ.restWidth, 1) }, deco = { value: PQ.scale };
+  var plateMat = new T.MeshStandardMaterial({ metalness: 1, roughness: 0.4, envMapIntensity: 1.15 });
+  plateMat.alphaToCoverage = true;
+  plateMat.onBeforeCompile = function (sh) {
+    sh.uniforms.uSize = plateSize; sh.uniforms.uDeco = deco;
+    sh.vertexShader = 'uniform vec2 uSize;\nvarying vec2 vPQ;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\nvPQ = vec2(position.x * uSize.x, (position.y - 0.5) * uSize.y);');
+    sh.fragmentShader = 'uniform vec2 uSize; uniform float uDeco;\nvarying vec2 vPQ;\n' + GLSL_NOISE3 + '\n' + [
+      'vec4 plateInfo(vec2 p) {',                                // height, gold mask, distance inside the edge, bronze mottling
+      '  vec2 hs = uSize * 0.5 / uDeco, a = abs(p) / uDeco;',              // trim, notches and bolts are drawn at uDeco scale
+      '  float e = min(min(hs.x - a.x, hs.y - a.y), length(a - hs) - 0.2);',   // the corners are scooped out in quarter circles
+      '  float n = fbm3(vec3(p * 7.0, 0.0)), n2 = pqn(vec3(p * 26.0, 3.0)); p = p / uDeco;',
+      '  float h = 0.032 * smoothstep(0.0, 0.04, e) * (1.0 - smoothstep(0.085, 0.125, e));',   // raised trim: bevel up, flat top, bevel down
+      '  float gold = 1.0 - smoothstep(0.115, 0.125, e);',
+      '  h += smoothstep(0.115, 0.13, e) * (0.006 * n + 0.0025 * n2 - 0.006);',               // the hammered bronze field
+      '  vec2 bp = a - (hs - vec2(0.3)); float q = length(bp) / 0.07;',                        // four domed bolts with a slot
+      '  if (q < 1.0) { float slot = 1.0 - smoothstep(0.007, 0.014, abs(bp.x - bp.y) * 0.707);',
+      '    h = 0.04 * sqrt(1.0 - q * q) - slot * 0.012 * (1.0 - q); gold = 1.0; }',
+      '  return vec4(h * uDeco, gold, e * uDeco, n);',
+      '}', ''].join('\n') + sh.fragmentShader
+      .replace('#include <clipping_planes_fragment>', '#include <clipping_planes_fragment>\nvec4 PQI = plateInfo(vPQ);\nif (PQI.z < -0.03) discard;')
+      .replace('#include <color_fragment>', '#include <color_fragment>\ndiffuseColor.rgb = mix(vec3(0.05, 0.028, 0.013) * (0.6 + 0.8 * PQI.w), vec3(1.0, 0.68, 0.24), PQI.y);\ndiffuseColor.a = clamp(PQI.z / max(fwidth(PQI.z), 1e-4) + 0.5, 0.0, 1.0);')
+      .replace('#include <roughnessmap_fragment>', '#include <roughnessmap_fragment>\nroughnessFactor = mix(0.58 + 0.2 * PQI.w, 0.2, PQI.y);')
+      .replace('#include <metalnessmap_fragment>', '#include <metalnessmap_fragment>\nmetalnessFactor = mix(0.55, 1.0, PQI.y);')
+      .replace('#include <normal_fragment_maps>', '#include <normal_fragment_maps>\n{ vec3 sp = -vViewPosition; vec3 sx = dFdx(sp), sy = dFdy(sp); vec3 r1 = cross(sy, normal), r2 = cross(normal, sx); float det = dot(sx, r1);\n  vec3 grad = sign(det) * (dFdx(PQI.x) * r1 + dFdy(PQI.x) * r2); normal = normalize(abs(det) * normal - grad); }')
+      .replace('#include <opaque_fragment>', CAP_LINE(5));
+  };
+  var pGeo = new T.PlaneGeometry(1, 1, 1, 1); pGeo.translate(0, 0.5, 0);
+  P.plate = new T.Mesh(pGeo, plateMat); P.plate.position.z = 0.006; P.group.add(P.plate); P.plateSize = plateSize; P.deco = deco;
+
+  // raised, bevelled gold letters cut from the serif font's outlines
+  P.gold = capHighlights(new T.MeshStandardMaterial({ metalness: 1, roughness: 0.16, envMapIntensity: 1.5 }), 6);
+  P.gold.color.setRGB(1.0, 0.72, 0.26); P.gold.emissive.setRGB(0.2, 0.12, 0.02);   // a touch of inner glow keeps the gold bright when it faces a dim part of the room
+  P.goldSel = new T.MeshStandardMaterial({ metalness: 0.6, roughness: 0.3, emissive: new T.Color(0.35, 0.24, 0.05) });   // letters you have selected
+  P.goldSel.color.setRGB(1.0, 0.9, 0.62);
+  var cache = {};
+  function parse(g) {
+    var contours = [], cur = null, x = 0, y = 0, re = /([MLQCZ])([^MLQCZ]*)/g, m, s, t, u;
+    function push(px, py) { var l = cur[cur.length - 1]; if (!l || Math.abs(l[0] - px) + Math.abs(l[1] - py) > 1e-5) cur.push([px, py]); x = px; y = py; }
+    while ((m = re.exec(g[1]))) {
+      var a = m[2].trim() ? m[2].trim().split(/[\s,]+/).map(function (n) { return Number(n) / PUPM; }) : [];
+      if (m[1] === 'M') { cur = []; contours.push(cur); push(a[0], a[1]); }
+      else if (!cur) continue;
+      else if (m[1] === 'L') push(a[0], a[1]);
+      else if (m[1] === 'Q') { var x0 = x, y0 = y; for (s = 1; s <= 5; s++) { t = s / 5; u = 1 - t; push(u * u * x0 + 2 * u * t * a[0] + t * t * a[2], u * u * y0 + 2 * u * t * a[1] + t * t * a[3]); } }
+      else if (m[1] === 'C') { var cx = x, cy = y; for (s = 1; s <= 7; s++) { t = s / 7; u = 1 - t; push(u * u * u * cx + 3 * u * u * t * a[0] + 3 * u * t * t * a[2] + t * t * t * a[4], u * u * u * cy + 3 * u * u * t * a[1] + 3 * u * t * t * a[3] + t * t * t * a[5]); } }
+    }
+    return contours.map(function (c) { var f = c[0], l = c[c.length - 1]; return (Math.abs(f[0] - l[0]) + Math.abs(f[1] - l[1]) < 1e-5) ? c.slice(0, -1) : c; })
+      .filter(function (c) { return c.length > 2; });
+  }
+  function area(c) { var s = 0; for (var i = 0; i < c.length; i++) { var p = c[i], q = c[(i + 1) % c.length]; s += p[0] * q[1] - q[0] * p[1]; } return s / 2; }
+  function inside(pt, c) {
+    var inn = false;
+    for (var i = 0, j = c.length - 1; i < c.length; j = i++) {
+      if ((c[i][1] > pt[1]) !== (c[j][1] > pt[1]) && pt[0] < (c[j][0] - c[i][0]) * (pt[1] - c[i][1]) / (c[j][1] - c[i][1]) + c[i][0]) inn = !inn;
+    }
+    return inn;
+  }
+  function v2(p) { return new T.Vector2(p[0], p[1]); }
+  P.glyph = function (ch) {
+    if (cache[ch]) return cache[ch];
+    var g = PF.glyphs[ch] || (/\s/.test(ch) ? null : PF.glyphs['?']), res = { adv: g ? g[0] / PUPM : 0.25, geo: null };
+    var cs = g ? parse(g) : [];
+    if (cs.length) {
+      var depthOf = cs.map(function (c, i) { var d = 0; for (var j = 0; j < cs.length; j++) if (j !== i && inside(c[0], cs[j])) d++; return d; });
+      var outer = {}, list = [];
+      cs.forEach(function (c, i) { if (depthOf[i] % 2 === 0) { outer[i] = new T.Shape(c.map(v2)); list.push(outer[i]); } });
+      cs.forEach(function (c, i) {
+        if (depthOf[i] % 2 === 0) return;
+        var best = -1, ba = 1e9;
+        for (var j in outer) if (inside(c[0], cs[j]) && Math.abs(area(cs[j])) < ba) { ba = Math.abs(area(cs[j])); best = j; }
+        if (best >= 0) outer[best].holes.push(new T.Path(c.map(v2)));
+      });
+      var geo = new T.ExtrudeGeometry(list, { depth: 0.05, bevelEnabled: true, bevelThickness: 0.05, bevelSize: 0.009, bevelSegments: 3, curveSegments: 1 });
+      geo.translate(0, 0, 0.05);
+      res.geo = geo;
+    }
+    cache[ch] = res; return res;
+  };
+
+  // the gold block cursor: same gold as the letters, with real thickness
+  var cGeo = new T.RoundedBoxGeometry(1, 1, 1, 2, 0.04); cGeo.translate(0.5, 0.5, 0.5);
+  P.cursor = new T.Mesh(cGeo, P.gold); P.group.add(P.cursor);
+  return P;
+})();
+
+function cpIndex(utf16) { return Array.from(input.value.slice(0, utf16 || 0)).length; }
+function utf16Index(cp) { return Array.from(input.value).slice(0, cp).join('').length; }
+
+// Brings the plaque's letters in line with the text box: all of them while open, none while closed.
+function plaqueSync() {
+  if (!plaque) return;
+  var P = plaque, want = P.open ? Array.from(input.value) : [], old = P.letters, p = 0, s = 0, i;
+  while (p < old.length && p < want.length && old[p].ch === want[p]) p++;
+  while (s < old.length - p && s < want.length - p && old[old.length - 1 - s].ch === want[want.length - 1 - s]) s++;
+  var removed = old.slice(p, old.length - s), added = [];
+  for (i = 0; i < removed.length; i++) P.group.remove(removed[i].holder);         // letters simply switch off...
+  for (i = p; i < want.length - s; i++) {                                         // ...and on. No animation.
+    var g = P.glyph(want[i]), holder = new T.Group(), mesh = null;
+    if (want[i] !== '\n' && g.geo) { mesh = new T.Mesh(g.geo, P.gold); holder.add(mesh); }
+    P.group.add(holder);
+    added.push({ ch: want[i], nl: want[i] === '\n', adv: want[i] === '\n' ? 0 : g.adv, holder: holder, mesh: mesh });
+  }
+  P.letters = old.slice(0, p).concat(added, old.slice(old.length - s));
+  plaqueLayout();
+}
+// Plaque measurements, all shrunk together by PQ.scale.
+function pqv(k) { return PQ[k] * PQ.scale; }
+var PQ_TRACK = 0.025;
+// Places the letters. While editing, the letters part to make room for the cursor, the way the balloons do.
+function plaqueLayout() {
+  var P = plaque, lines = [[]], i, k, PCAP = PF.capHeight / PF.unitsPerEm;
+  var ci = (P.open && document.activeElement === input) ? cpIndex(input.selectionEnd) : (P.open ? P.letters.length : -1);
+  var gapEm = PCAP * 0.62 + 0.08, x = 0, curLine = 0, curX = 0;
+  P.ci = ci;
+  for (i = 0; i <= P.letters.length; i++) {
+    if (i === ci) { curLine = lines.length - 1; curX = x; x += gapEm; }
+    if (i === P.letters.length) break;
+    var it = P.letters[i];
+    if (it.nl) { lines[lines.length - 1].w = x; lines.push([]); x = 0; it.line = -1; continue; }
+    it.tem = x; it.line = lines.length - 1; lines[lines.length - 1].push(it); x += it.adv + PQ_TRACK;
+  }
+  lines[lines.length - 1].w = x;
+  var widest = 0.01;
+  for (k = 0; k < lines.length; k++) if (lines[k].w > widest) widest = lines[k].w;
+  var em = PQ.letterSize / PCAP, avail = PQ.maxWidth - 2 * pqv('padX');
+  if (widest * em > avail) em = avail / widest;
+  P.em = em; P.cap = PCAP * em; P.lineH = P.cap * 1.75; P.layoutLines = lines;
+  P.lineW = lines.map(function (ln) { return ln.w * em; });
+  for (i = 0; i < P.letters.length; i++) P.letters[i].tx = (P.letters[i].tem || 0) * em;
+  P.curLine = ci < 0 ? 0 : curLine; P.curX = ci < 0 ? 0 : curX * em;
+  var nLines = P.open ? lines.length : 1;
+  var w = Math.max(pqv('restWidth'), (P.open ? widest * em : P.cap * 0.75) + 2 * pqv('padX')), h = P.cap + (nLines - 1) * P.lineH + 2 * pqv('padY');
+  // the plate still stretches on springs: stretching one way briefly squashes the other way
+  P.h.v -= (w - P.lastW) * 1.1; P.w.v -= (h - P.lastH) * 1.4;
+  P.lastW = w; P.lastH = h; P.w.t = w; P.h.t = h;
+}
+// Which character a click on the plaque lands nearest to.
+function plaqueIndexAt(cx, cy) {
+  var P = plaque, c = canvas.getBoundingClientRect(), tile = c.width / F.tilesWide;
+  var lx = (cx - c.left) / tile - HW + P.w.x / 2 - pqv('padX'), ly = (HH - (cy - c.top) / tile) + OH - pqv('marble');
+  var top = P.h.x - pqv('padY') - P.cap, k = clamp(Math.round((top + P.cap / 2 - ly) / P.lineH), 0, P.layoutLines.length - 1), idx = 0, i;
+  for (i = 0; i < k; i++) idx += P.layoutLines[i].length + 1;
+  var ln = P.layoutLines[k];
+  lx -= lineOff(k, P.w.x);
+  for (i = 0; i < ln.length; i++) { if (lx < ln[i].tx + ln[i].adv * P.em / 2) break; idx++; }
+  return idx;
+}
+// While the plaque is open each line is centered on the plate; at rest the cursor starts from the left.
+function lineOff(k, w) {
+  var P = plaque;
+  if (!P.open || !P.lineW || P.lineW[k] == null) return 0;
+  return Math.max(0, (w - 2 * pqv('padX') - P.lineW[k]) / 2);
+}
+function updatePlaque(dt) {
+  if (!plaque || !CONFIG.ui.plaque) return;
+  var P = plaque, i, l, mb = pqv('marble'), depth = LIP_BACK * PQ.depth;
+  var focused = document.activeElement === input, s0 = 0, s1 = 0;
+  if (focused) { s0 = cpIndex(input.selectionStart); s1 = cpIndex(input.selectionEnd); }
+  if (P.open && focused && s1 !== P.ci) plaqueLayout();                          // the cursor moved: make room in its new spot
+  var w = Math.max(0.5, P.w.step(dt)), h = Math.max(0.3, P.h.step(dt)), mw = w + 2 * mb, mh = h + 2 * mb;
+  P.marble.scale.set(mw, mh, depth);
+  P.plate.position.y = mb; P.plate.scale.set(w, h, 1); P.plateSize.value.set(w, h); P.deco.value = PQ.scale;
+  var left = -w / 2 + pqv('padX'), top = mb + h - pqv('padY') - P.cap, z = 0.018;
+  // keep the invisible typing area exactly over the marble block
+  ui.style.left = ((HW - mw / 2) / F.tilesWide * 100) + '%'; ui.style.width = (mw / F.tilesWide * 100) + '%';
+  ui.style.bottom = (F.borderTiles / F.tilesHigh * 100) + '%'; ui.style.height = (mh / F.tilesHigh * 100) + '%';
+  for (i = 0; i < P.letters.length; i++) {
+    l = P.letters[i];
+    if (l.nl) continue;
+    l.holder.position.set(left + lineOff(l.line, w) + l.tx, top - l.line * P.lineH, z);
+    l.holder.scale.setScalar(P.em);
+    if (l.mesh) l.mesh.material = (focused && s0 !== s1 && i >= s0 && i < s1) ? P.goldSel : P.gold;
+  }
+  // the cursor keeps its glide and blink
+  P.cursorX.t = P.curX + lineOff(P.curLine, w); P.cursorY.t = -P.curLine * P.lineH;
+  P.clock += dt;
+  P.cursor.visible = (P.clock % M.caretBlinkSeconds) < M.caretBlinkSeconds * 0.55;
+  P.cursor.position.set(left + P.cursorX.step(dt), top + P.cursorY.step(dt) - P.cap * 0.14, z);
+  P.cursor.scale.set(P.cap * 0.62, P.cap * 1.24, 0.14 * P.em + 0.002);
+}
+function setPlaque(on) {
+  CONFIG.ui.plaque = !!on && !!plaque;
+  root.classList.toggle('dio-plaque', CONFIG.ui.plaque);
+  if (plaque) plaque.group.visible = CONFIG.ui.plaque;
+  if (!CONFIG.ui.plaque) { ui.style.left = ui.style.width = ui.style.bottom = ui.style.height = ''; }
+  fitBox();
+}
+if (plaque) {
+  var wasFocused = false;
+  input.addEventListener('focus', function () { plaque.open = true; plaque.clock = 0; plaqueSync(); });
+  document.addEventListener('selectionchange', function () { if (document.activeElement === input) plaque.clock = 0; });
+  input.addEventListener('blur', function () { plaque.open = false; plaqueSync(); });
+  input.addEventListener('input', function () { plaque.clock = 0; plaqueSync(); });
+  input.addEventListener('keydown', function () { plaque.clock = 0; });
+  ui.addEventListener('pointerdown', function () { wasFocused = document.activeElement === input; });
+  ui.addEventListener('click', function (e) {
+    if (!CONFIG.ui.plaque || !wasFocused || e.shiftKey) return;
+    var u = utf16Index(plaqueIndexAt(e.clientX, e.clientY));
+    try { input.setSelectionRange(u, u); } catch (er) {}
+    plaque.clock = 0;
+  });
+  plaqueLayout(); plaque.w.snap(plaque.w.t); plaque.h.snap(plaque.h.t);
+}
+
+// Desktop: once the scene has been clicked (or reached with Tab), just start typing. The text box opens
+// with the cursor after the current words, and what you type is added after a space.
+if (!IS_TOUCH) {
+  if (!root.hasAttribute('tabindex')) root.setAttribute('tabindex', '0');
+  root.addEventListener('pointerdown', function (e) { if (!inUI(e) && e.pointerType === 'mouse') setTimeout(function () { try { root.focus({ preventScroll: true }); } catch (er) {} }, 0); });
+  root.addEventListener('keydown', function (e) {
+    if (e.target === input || e.ctrlKey || e.metaKey || e.altKey || e.key.length !== 1) return;
+    e.preventDefault();
+    var v = input.value, add = (v && !/[\s]$/.test(v) && e.key !== ' ' ? ' ' : '') + e.key;
+    input.focus({ preventScroll: true });
+    input.value = v + add;
+    var end = input.value.length;
+    try { input.setSelectionRange(end, end); } catch (er) {}
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+  });
+}
 
 // ---------------------------------------------------------------- viewing angle: mouse position, phone tilt, or finger drag
 var viewX = new Spring(V.stiffness, V.damping), viewY = new Spring(V.stiffness, V.damping);
@@ -1805,6 +2142,7 @@ function frame(now, skipDraw) {
     c.mesh.position.x += (c.speed * CLOUDS.speed + c.push) * dt;
     if (c.mesh.position.x > 72) c.mesh.position.x = -72; else if (c.mesh.position.x < -72) c.mesh.position.x = 72;
   }
+  updatePlaque(dt);
   updateShapes(dt, time);
   updateWord(dt, time);
   updateShadows();
@@ -1875,9 +2213,17 @@ param('quality.bloom', 'Glow (1 = on, 0 = off)', 0, 1, 1, function () { return Q
 param('quality.adaptive', 'Automatic quality (1 = on, 0 = off)', 0, 1, 1, function () { return CONFIG.quality.adaptive ? 1 : 0; }, function (v) { CONFIG.quality.adaptive = !!v; mon.slow = 0; mon.frames = 0; mon.time = 0; });
 param('quality.bladeCount', 'Grass blades: how many', 0, 80000, 1000, function () { return Q.bladeCount; }, setBladeCount);
 param('frame.widthPercent', 'Frame width on the page (%)', 20, 100, 1, function () { return F.widthPercent; }, function (v) { F.widthPercent = v; root.style.width = v + '%'; root.style.marginLeft = root.style.marginRight = 'auto'; });
+param('shapes.furDensity', 'Shapes: fur strands per tile (fewer = chunkier)', 5, 40, 1, function () { return SH.furDensity; }, function (v) { SH.furDensity = v; FUZZ.grain.value = v * (IS_TOUCH ? 0.85 : 1); });
 param('shapes.furWidth', 'Shapes: fur strand thickness', 0.1, 0.7, 0.01, function () { return SH.furWidth; }, function (v) { SH.furWidth = v; FUZZ.width.value = v; });
 param('sun.rays2', 'Sun rays: how many in the second layer', 0, 36, 1, function () { return SUN.rays2; }, function (v) { SUN.rays2 = v; sunUniforms.uCount2.value = v; });
 param('clouds.opacity', 'Clouds: how solid the puffy ones are', 0, 1, 0.02, function () { return CLOUDS.opacity; }, function (v) { CLOUDS.opacity = v; for (var i = 0; i < clouds.length; i++) if (clouds[i].kind === 1) clouds[i].mesh.material.opacity = v; });
+param('look.grassScale', 'Grass picture: size (tiles per copy)', 0.5, 12, 0.1, function () { return LOOK.grassScale; }, function (v) { LOOK.grassScale = v; GRASS.set.value.x = v; });
+param('look.grassColor', 'Grass picture: how much of its own color shows', 0, 1, 0.02, function () { return LOOK.grassColor; }, function (v) { LOOK.grassColor = v; GRASS.set.value.y = v; });
+param('look.grassBump', 'Grass picture: fiber bump strength', 0, 3, 0.05, function () { return LOOK.grassBump; }, function (v) { LOOK.grassBump = v; GRASS.set.value.z = v; });
+param('look.grassDrift', 'Grass picture: light and dark patches', 0, 1.5, 0.02, function () { return LOOK.grassDrift; }, function (v) { LOOK.grassDrift = v; GRASS.set.value.w = v; });
+param('plaque.letterSize', 'Plaque: letter height (tiles)', 0.15, 0.8, 0.01, function () { return PQ.letterSize; }, function (v) { PQ.letterSize = v; if (plaque) plaqueLayout(); });
+param('ui.plaque', 'Text box on a marble plaque (1 = on, 0 = off)', 0, 1, 1, function () { return CONFIG.ui.plaque ? 1 : 0; }, setPlaque);
+setPlaque(CONFIG.ui.plaque);
 if (F.widthPercent !== 100) { root.style.width = F.widthPercent + '%'; root.style.marginLeft = root.style.marginRight = 'auto'; }
 function setParam(key, value) {
   for (var i = 0; i < PARAMS.length; i++) if (PARAMS[i].key === key) {

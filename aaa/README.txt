@@ -1,5 +1,5 @@
-DUSTIN DO DIORAMA
-=================
+DUSTIN DO DIORAMA  (version 8.01)
+=================================
 
 A tile-framed 3D scene with editable gold balloon letters. Plain static files,
 no build step, no internet needed. Double-click index.html to run it.
@@ -8,9 +8,11 @@ FILES
   index.html            Demo page. Shows the minimum markup you need.
   diorama.css           Styles for the frame container and the text box.
   diorama.js            The scene. All settings are in the CONFIG block at the top.
-  diorama-panel.js      Optional settings panel shown under the scene (31 live sliders).
+  diorama-panel.js      Optional settings panel shown under the scene (38 live sliders).
   poster.jpg            Still image shown if a browser cannot run 3D.
   lib/three-bundle.js   Three.js r187 (MIT license), bundled so nothing loads from the web.
+  lib/font-garamond.js  EB Garamond Regular letter outlines for the plaque (SIL Open Font License 1.1).
+  lib/grass-textures.js The three grass pictures, packed so they load from disk (see GRASS below).
   lib/font-fredoka.js   Fredoka Bold letter outlines (SIL Open Font License 1.1).
 
 PUTTING IT ON YOUR OWN PAGE
@@ -35,7 +37,7 @@ CHANGING THINGS
   The starting words are CONFIG.text; \n starts a new line (up to 3 lines of 24).
 
 THE SETTINGS PANEL
-  The panel under the scene changes 31 settings while the scene runs. Lines marked
+  The panel under the scene changes 38 settings while the scene runs. Lines marked
   [panel] in CONFIG are the ones it controls, under the same names.
   - "Shuffle shapes" picks a new layout number. The same number always gives the
     same layout, so visitors see exactly what you settled on.
@@ -60,3 +62,19 @@ QUICK EXPERIMENTS (browser console)
   DIORAMA.set('sun.rays', 8)        change any panel setting by name
   DIORAMA.gust(1)                   send a gust of wind (1 = to the right, -1 = left)
   DIORAMA.log                       what the automatic quality control has turned down
+
+GRASS PICTURES
+  The ground uses three grass pictures (color, bump and drift), packed into
+  lib/grass-textures.js so the scene works when opened straight from disk. To swap
+  a picture, send the new one to whoever is editing the scene to repack it.
+  Leave the grass-textures line out of the page (or set grassTexture: false in
+  CONFIG) to get the plain shaded ground.
+
+THE MARBLE PLAQUE
+  The text box is a white marble block on the frame's bottom edge with a bronze
+  plate and raised gold letters. Its settings are in CONFIG.plaque. Set
+  ui.plaque to false (or use the panel switch) to go back to the clear text box.
+
+TYPING STRAIGHT IN (desktop)
+  After clicking anywhere on the scene, just start typing: the plaque opens and
+  your words go after the current ones, with a space in between.
