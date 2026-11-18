@@ -18,7 +18,7 @@
 var CONFIG = {
 
   // ---------------------------------------------------------------- TEXT
-  text: 'Hello. Welcome,\nFRIEND!',   // words shown when the page loads (\n starts a new line)
+  text: 'Hello. Welcome,\nFRIEND!\nto dustindo.com',   // words shown when the page loads (\n starts a new line)
   maxChars: 24,             // longest line the text box accepts
   maxLines: 3,              // most lines of text
 
@@ -33,7 +33,7 @@ var CONFIG = {
     groutColor: '#b7b5af',
     widthPercent: 100,      // how wide the frame is drawn, as a percent of the space it has     [panel]
     smudges: 18,            // how many smudges and fingerprints are on the tiles and grout
-    smudgeOpacity: 0.18,     // 0 = spotless, 1 = very grubby                          [panel]
+    smudgeOpacity: 0.05,     // 0 = spotless, 1 = very grubby                          [panel]
     smudgeColors: ['#e0532a', '#f0c22e']   // orange-red and yellow
   },
 
@@ -63,8 +63,8 @@ var CONFIG = {
     grassLight: '#9be35a',  // sunlit tips
     shadow: 0.62,           // how dark the shaded sides and shadows are (0 = flat, 1 = deep)   [panel]
     hazeFore: 0,            // atmospheric haze on each depth layer, in percent                 [panel]
-    hazeMid: 15,            //                                                                  [panel]
-    hazeBack: 42,           //                                                                  [panel]
+    hazeMid: 32,            //                                                                  [panel]
+    hazeBack: 71,           //                                                                  [panel]
     foreRise: 2.0,          // how much the foreground climbs as it goes back. More = the foreground fills more of the view
     midHeight: -1.0,        // how high the mid-ground layer sits. Higher = it shows more above the foreground
     backHeight: 0.0,        // how high the painted background ridge sits
@@ -136,7 +136,7 @@ var CONFIG = {
     count: 11,              // how many shapes in total                                [panel]
     minSize: 1.5,           // height of the smallest shapes, in tiles                 [panel]
     maxScale: 2.5,          // the largest shapes are this many times the smallest     [panel]
-    seed: 6117,                // the layout. Same number = same layout every visit       [panel]
+    seed: 5384,                // the layout. Same number = same layout every visit       [panel]
     fuzz: 0.1,             // length of the fur, in tiles. 0 = smooth                 [panel]
     furDensity: 15,         // strands per tile. Fewer = bigger, chunkier tufts          [panel]
     furWidth: 0.46,         // thickness of each strand. 0.2 = fine hair, 0.6 = chunky  [panel]
@@ -170,7 +170,8 @@ var CONFIG = {
     padY: 0.34,             // space above and below the words
     marble: 0.2,            // width of the white marble border around the plate
     depth: 0.5,             // how deep the marble block is, as a share of the frame's inner lip
-    scale: 0.82             // overall size of the plaque (plate, border, trim, bolts), not the letters
+    scale: 0.82,            // overall size of the plaque (plate, border, trim, bolts), not the letters
+    phonePortrait: 1.8      // on a phone held upright, the plaque and its letters are this many times bigger
   },
 
   // ---------------------------------------------------------------- PERFORMANCE
@@ -184,7 +185,7 @@ var CONFIG = {
       grassBlades: false,   // individual blades of grass. false = the grass picture only    [panel]
       bladeCount: 30000,    // number of blades                                              [panel]
       flowers: 520,
-      bloom: false,         // soft glow on the sun and gold highlights                     [panel]
+      bloom: true,          // soft glow on the sun and gold highlights                     [panel]
       sparkles: 16,         // twinkles on the letters
       fuzzLayers: 8,        // layers the fur is drawn in. More = fuller fur, slower. 0 = flat velvet shading only
       letterDetail: 46      // smoothness of the balloon letters (30 = chunky, 60 = very smooth)
@@ -1691,19 +1692,45 @@ if (PF) plaque = (function buildPlaque() {
   // white marble, with soft grey veins that stay put however the block stretches
   var mGeo = new T.BoxGeometry(1, 1, 1); mGeo.translate(0, 0.5, -0.5);
   var marbleMat = new T.MeshStandardMaterial({ color: 0xffffff, roughness: 0.16, metalness: 0, envMapIntensity: 1 });
+  // If a marble picture is packed into the page (lib/marble-texture.js) it is used, at a fixed size: its width matches
+  // the widest the plaque can ever get. It never zooms or stretches; a growing plaque simply reveals more of it.
+  // Without it, the marble is painted by code as before.
+  var marble = { map: { value: null }, on: { value: 0 }, box: { value: new T.Vector3(3, 1, 0.5) }, img: { value: new T.Vector2(12, 1.5) } };
+  if (window.DIORAMA_MARBLE) {
+    var mImg = new Image();
+    mImg.onload = function () {
+      var t = new T.Texture(mImg); t.colorSpace = T.SRGBColorSpace; t.minFilter = T.LinearMipmapLinearFilter;
+      t.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy()); t.needsUpdate = true;
+      marble.map.value = t; marble.on.value = 1;
+    };
+    mImg.src = window.DIORAMA_MARBLE;
+  }
   marbleMat.onBeforeCompile = function (sh) {
-    sh.vertexShader = 'varying vec3 vMW;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\nvMW = (modelMatrix * vec4(transformed, 1.0)).xyz;');
-    sh.fragmentShader = 'varying vec3 vMW;\n' + GLSL_NOISE3 + '\n' + sh.fragmentShader
+    sh.uniforms.uMarble = marble.map; sh.uniforms.uMarbleOn = marble.on; sh.uniforms.uBox = marble.box; sh.uniforms.uImg = marble.img;
+    sh.vertexShader = 'uniform vec3 uBox;\nvarying vec3 vMW; varying vec3 vLoc; varying vec3 vON;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\nvMW = (modelMatrix * vec4(transformed, 1.0)).xyz; vLoc = position * uBox; vON = normal;');
+    sh.fragmentShader = 'uniform sampler2D uMarble; uniform float uMarbleOn; uniform vec3 uBox; uniform vec2 uImg;\nvarying vec3 vMW; varying vec3 vLoc; varying vec3 vON;\n' + GLSL_NOISE3 + '\n' + sh.fragmentShader
       .replace('#include <color_fragment>', [
         '#include <color_fragment>',
+        'vec3 marbleTex = vec3(0.0);',
+        'if (uMarbleOn > 0.5) {',
+        '  float W = uImg.x; vec2 uv;',                                       // the picture is as wide as the largest possible plaque
+        '  if (abs(vON.z) > 0.5) uv = vec2(vLoc.x / W + 0.5, (vLoc.y - uImg.y) / W + 0.5);',   // centered on the largest plaque's middle
+        '  else if (abs(vON.y) > 0.5) uv = vec2(vLoc.x / W + 0.5, 0.5 + (vLoc.z + uBox.z * 0.5) / W);',
+        '  else uv = vec2(0.5 + vLoc.z / W, (vLoc.y - uImg.y) / W + 0.5);',
+        '  marbleTex = texture2D(uMarble, uv).rgb; diffuseColor.rgb *= marbleTex * 0.53;',   // the lit version, used only on the top and sides
+        '} else',
         '{ vec3 q = vMW * vec3(1.6, 2.1, 1.6); float n = fbm3(q);',
         '  float vein = 1.0 - smoothstep(0.0, 0.08, abs(sin(q.x * 1.2 + q.y * 0.8 + n * 7.0)));',
         '  float fine = 1.0 - smoothstep(0.0, 0.03, abs(sin(q.x * 3.1 - q.y * 2.3 + fbm3(q * 2.3 + 4.0) * 9.0)));',
         '  diffuseColor.rgb *= mix(vec3(0.5, 0.496, 0.488) * (0.96 + 0.08 * n), vec3(0.11, 0.11, 0.125), clamp(vein * 0.85 + fine * 0.5, 0.0, 1.0)); }'
       ].join('\n'))
-      .replace('#include <opaque_fragment>', CAP_LINE(1.7));
+      // Front face: your picture exactly as it is (no dimming, lighting, reflections or tone mapping).
+      // Top and sides: halfway between your picture as-is and the scene's full lighting.
+      .replace('#include <opaque_fragment>', 'outgoingLight = min(outgoingLight, vec3(1.7));\nif (uMarbleOn > 0.5) outgoingLight = abs(vON.z) > 0.5 ? marbleTex : mix(marbleTex, outgoingLight, 0.5);\n#include <opaque_fragment>')
+      .replace('#include <tonemapping_fragment>', '');   // tone mapping is applied by hand below for the painted fallback only
+    sh.fragmentShader = sh.fragmentShader.replace('#include <colorspace_fragment>', '#ifdef TONE_MAPPING\nif (uMarbleOn < 0.5) { gl_FragColor.rgb = NeutralToneMapping(gl_FragColor.rgb * toneMappingExposure); }\n#endif\n#include <colorspace_fragment>');   // with glow on, the glow pass tone-maps everything afterward, so this is skipped
   };
-  P.marble = new T.Mesh(mGeo, marbleMat); P.group.add(P.marble);
+  P.marble = new T.Mesh(mGeo, marbleMat); P.group.add(P.marble); P.marbleBox = marble.box; P.marbleImg = marble.img;
 
   // the bronze plate: one flat panel whose notched corners, gold trim, bumps and bolts are all drawn by its shader
   var plateSize = { value: new T.Vector2(PQ.restWidth, 1) }, deco = { value: PQ.scale };
@@ -1812,7 +1839,10 @@ function plaqueSync() {
   plaqueLayout();
 }
 // Plaque measurements, all shrunk together by PQ.scale.
-function pqv(k) { return PQ[k] * PQ.scale; }
+// On a phone held upright the frame is small, so the plaque and its letters are drawn larger (PQ.phonePortrait).
+var mqPortrait = window.matchMedia ? window.matchMedia('(orientation: portrait)') : null;
+function pqBoost() { return (IS_TOUCH && mqPortrait && mqPortrait.matches) ? PQ.phonePortrait : 1; }
+function pqv(k) { return PQ[k] * PQ.scale * pqBoost(); }
 var PQ_TRACK = 0.025;
 // Places the letters. While editing, the letters part to make room for the cursor, the way the balloons do.
 function plaqueLayout() {
@@ -1830,7 +1860,7 @@ function plaqueLayout() {
   lines[lines.length - 1].w = x;
   var widest = 0.01;
   for (k = 0; k < lines.length; k++) if (lines[k].w > widest) widest = lines[k].w;
-  var em = PQ.letterSize / PCAP, avail = PQ.maxWidth - 2 * pqv('padX');
+  var em = PQ.letterSize * pqBoost() / PCAP, avail = PQ.maxWidth - 2 * pqv('padX');
   if (widest * em > avail) em = avail / widest;
   P.em = em; P.cap = PCAP * em; P.lineH = P.cap * 1.75; P.layoutLines = lines;
   P.lineW = lines.map(function (ln) { return ln.w * em; });
@@ -1866,8 +1896,11 @@ function updatePlaque(dt) {
   if (focused) { s0 = cpIndex(input.selectionStart); s1 = cpIndex(input.selectionEnd); }
   if (P.open && focused && s1 !== P.ci) plaqueLayout();                          // the cursor moved: make room in its new spot
   var w = Math.max(0.5, P.w.step(dt)), h = Math.max(0.3, P.h.step(dt)), mw = w + 2 * mb, mh = h + 2 * mb;
-  P.marble.scale.set(mw, mh, depth);
-  P.plate.position.y = mb; P.plate.scale.set(w, h, 1); P.plateSize.value.set(w, h); P.deco.value = PQ.scale;
+  P.marble.scale.set(mw, mh, depth); P.marbleBox.value.set(mw, mh, depth);
+  // the largest the block can get: full width, three lines tall (letters at their normal size)
+  var capMax = PQ.letterSize * pqBoost(), maxH = capMax + (CONFIG.maxLines - 1) * capMax * 1.75 + 2 * pqv('padY') + 2 * mb;
+  P.marbleImg.value.set(PQ.maxWidth + 2 * mb, maxH / 2);
+  P.plate.position.y = mb; P.plate.scale.set(w, h, 1); P.plateSize.value.set(w, h); P.deco.value = PQ.scale * pqBoost();
   var left = -w / 2 + pqv('padX'), top = mb + h - pqv('padY') - P.cap, z = 0.018;
   // keep the invisible typing area exactly over the marble block
   ui.style.left = ((HW - mw / 2) / F.tilesWide * 100) + '%'; ui.style.width = (mw / F.tilesWide * 100) + '%';
@@ -1908,6 +1941,7 @@ if (plaque) {
     plaque.clock = 0;
   });
   plaqueLayout(); plaque.w.snap(plaque.w.t); plaque.h.snap(plaque.h.t);
+  if (mqPortrait) { var relayout = function () { plaqueLayout(); }; if (mqPortrait.addEventListener) mqPortrait.addEventListener('change', relayout); else if (mqPortrait.addListener) mqPortrait.addListener(relayout); }
 }
 
 // Desktop: once the scene has been clicked (or reached with Tab), just start typing. The text box opens

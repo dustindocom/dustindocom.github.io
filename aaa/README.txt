@@ -1,4 +1,4 @@
-DUSTIN DO DIORAMA  (version 8.01)
+DUSTIN DO DIORAMA  (version 8.04)
 =================================
 
 A tile-framed 3D scene with editable gold balloon letters. Plain static files,
@@ -12,6 +12,7 @@ FILES
   poster.jpg            Still image shown if a browser cannot run 3D.
   lib/three-bundle.js   Three.js r187 (MIT license), bundled so nothing loads from the web.
   lib/font-garamond.js  EB Garamond Regular letter outlines for the plaque (SIL Open Font License 1.1).
+  lib/marble-texture.js The marble picture for the plaque block, packed the same way.
   lib/grass-textures.js The three grass pictures, packed so they load from disk (see GRASS below).
   lib/font-fredoka.js   Fredoka Bold letter outlines (SIL Open Font License 1.1).
 
