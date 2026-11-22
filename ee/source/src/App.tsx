@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 import { objectMasks } from "./generated/objectMasks"
 
-type Page = "home" | "stages" | "cleo" | "hello" | "temp"
+type Page = "home" | "stages" | "cleo" | "dolly" | "temp"
 
 const OBJECTS = [
   { id: 1, name: "CAT" },
@@ -11,7 +11,7 @@ const OBJECTS = [
   { id: 5, name: "HAND MIRROR" },
   { id: 6, name: "GOLDEN COIN" },
   { id: 7, name: " HAIR COMB" },
-  { id: 8, name: "Oil lamp" },
+  { id: 8, name: "OIL LAMP" },
 ] as const
 
 function Icon({
@@ -128,7 +128,7 @@ function StagesPage({ go }: { go: (page: Page) => void }) {
       </header>
       <section className="stage-list">
         <button className="stage-card active" onClick={() => go("cleo")}>
-          <div className="stage-number">I</div>
+          <div className="stage-number"><span>I</span></div>
           <div className="stage-copy">
             <small>Nile Valley, Alexandria · Palace wing</small>
             <strong>Cleopatra&apos;s Chamber</strong>
@@ -139,8 +139,8 @@ function StagesPage({ go }: { go: (page: Page) => void }) {
         <GoldButton onClick={() => go("temp")} className="temp-button">
           Cleo temp
         </GoldButton>
-        <button className="stage-card" onClick={() => go("hello")}>
-          <div className="stage-number">II</div>
+        <button className="stage-card" onClick={() => go("dolly")}>
+          <div className="stage-number"><span>II</span></div>
           <div className="stage-copy">
             <small> Washington D.C., United States· Coming soon</small>
             <strong>Save Washington&apos;s Portrait</strong>
@@ -161,14 +161,14 @@ function SimplePage({
   type,
   go,
 }: {
-  type: "hello" | "temp"
+  type: "dolly" | "temp"
   go: (page: Page) => void
 }) {
   return (
     <PageFrame className={type === "temp" ? "temp-page" : "simple-page"}>
-      {type === "hello" && (
+      {type === "dolly" && (
         <img
-          className="hello-background"
+          className="dolly-background"
           src={`${import.meta.env.BASE_URL}assets/washington-preview.jpg`}
           alt=""
         />
@@ -184,10 +184,10 @@ function SimplePage({
       >
         <Icon name="back" />
       </button>
-      {type === "hello" && (
-        <div className="hello-card">
+      {type === "dolly" && (
+        <div className="dolly-card">
           <span>Chapter II</span>
-          <h2>Hello Traveler.</h2>
+          <h2>Dolly Traveler.</h2>
           <p>The next expedition is being prepared.</p>
           <GoldButton onClick={() => go("stages")}>
             Return to expeditions
@@ -213,11 +213,12 @@ function ObjectIcon({ id }: { id: number }) {
     >
       <img
         src={`${import.meta.env.BASE_URL}assets/c${String(id).padStart(2, "0")}.png`}
+        // Laid out in a 40-unit box, expressed as % so the icon scales with its box.
         style={{
-          width: 1320 * scale,
-          height: 2868 * scale,
-          left: -x1 * scale + (40 - (x2 - x1 + 1) * scale) / 2,
-          top: -y1 * scale + (40 - (y2 - y1 + 1) * scale) / 2,
+          width: `${(1320 * scale) / 0.4}%`,
+          height: `${(2868 * scale) / 0.4}%`,
+          left: `${(-x1 * scale + (40 - (x2 - x1 + 1) * scale) / 2) / 0.4}%`,
+          top: `${(-y1 * scale + (40 - (y2 - y1 + 1) * scale) / 2) / 0.4}%`,
         }}
       />
     </span>
@@ -258,6 +259,15 @@ function GamePage({ go }: { go: (page: Page) => void }) {
   const [settings, setSettings] = useState(false)
   const [sound, setSound] = useState(true)
   const [haptics, setHaptics] = useState(true)
+  // Intro plays over the already-rendered scene, so the hidden objects are
+  // loaded and on the board before the player ever sees it.
+  const [intro, setIntro] = useState<"playing" | "leaving" | "done">("playing")
+
+  useEffect(() => {
+    if (intro !== "leaving") return
+    const done = window.setTimeout(() => setIntro("done"), 450)
+    return () => window.clearTimeout(done)
+  }, [intro])
 
   useEffect(() => {
     if (!flight) return
@@ -271,7 +281,7 @@ function GamePage({ go }: { go: (page: Page) => void }) {
   }, [flight])
 
   const handleBoardTap = (event: React.PointerEvent<HTMLElement>) => {
-    if (flight || settings) return
+    if (flight || settings || intro !== "done") return
     const frame = frameRef.current
     if (!frame) return
     const rect = frame.getBoundingClientRect()
@@ -347,7 +357,10 @@ function GamePage({ go }: { go: (page: Page) => void }) {
         />
       )}
 
-      <section className="game-ui" aria-label="Objects to find">
+      <section
+        className={`game-ui ${intro === "playing" ? "ui-waiting" : ""}`}
+        aria-label="Objects to find"
+      >
         <div className="game-topbar">
           <button
             className="round-button"
@@ -385,7 +398,7 @@ function GamePage({ go }: { go: (page: Page) => void }) {
                 }`}
               >
                 <ObjectIcon id={object.id} />
-                <span style={{ fontSize: "12px" }}>{object.name}</span>
+                <span>{object.name}</span>
                 {isBursting && <i className="sparkles" aria-hidden="true" />}
               </div>
             )
@@ -393,7 +406,33 @@ function GamePage({ go }: { go: (page: Page) => void }) {
         </div>
       </section>
 
-      <div className="board-instruction">Tap the hidden treasures</div>
+      {intro === "done" && (
+        <div className="board-instruction">Tap the hidden treasures</div>
+      )}
+
+      {intro !== "done" && (
+        <div
+          className={`cleo-intro ${intro === "leaving" ? "intro-leaving" : ""}`}
+          onPointerUp={(e) => {
+            e.stopPropagation()
+            setIntro("leaving")
+          }}
+        >
+          <img
+            className="intro-portrait"
+            src={`${import.meta.env.BASE_URL}assets/cleo-img.png`}
+            alt="Cleopatra VII"
+            draggable={false}
+          />
+          <img
+            className="intro-text"
+            src={`${import.meta.env.BASE_URL}assets/cleo-text.png`}
+            alt="Cleopatra VII: My brother's gone mad with power! Let me gather my things and Caesar will surely take me in..."
+            draggable={false}
+          />
+          <div className="intro-continue">Click anywhere to continue</div>
+        </div>
+      )}
 
       {settings && (
         <div
@@ -468,7 +507,7 @@ export default function App() {
       {page === "home" && <HomePage onStart={() => setPage("stages")} />}
       {page === "stages" && <StagesPage go={setPage} />}
       {page === "cleo" && <GamePage go={setPage} />}
-      {(page === "hello" || page === "temp") && (
+      {(page === "dolly" || page === "temp") && (
         <SimplePage type={page} go={setPage} />
       )}
     </div>

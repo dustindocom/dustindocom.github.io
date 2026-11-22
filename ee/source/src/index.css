@@ -195,7 +195,7 @@
 
 .bottom-flourish {
   position: absolute;
-  bottom: 3.5%;
+  bottom: max(3.5%, calc(env(safe-area-inset-bottom) + 8px));
   left: 50%;
   color: #a77727;
   translate: -50%;
@@ -231,7 +231,7 @@
   display: grid;
   grid-template-columns: 48px 1fr 48px;
   align-items: center;
-  padding: max(20px, env(safe-area-inset-top)) 5% 0;
+  padding: max(20px, calc(env(safe-area-inset-top) + 8px)) 5% 0;
   text-align: center;
 }
 
@@ -310,7 +310,7 @@
   font-size: 20px;
 }
 
-.stage-number::first-line { rotate: -45deg; }
+.stage-number > span { rotate: -45deg; }
 
 .stage-copy { display: flex; min-width: 0; flex-direction: column; gap: 5px; }
 .stage-copy small { color: #bd9a56; font: 700 8px Arial, sans-serif; letter-spacing: .12em; text-transform: uppercase; }
@@ -322,7 +322,7 @@
 
 .progress-label {
   position: absolute;
-  bottom: 5%;
+  bottom: max(5%, calc(env(safe-area-inset-bottom) + 12px));
   left: 10%;
   right: 10%;
   display: flex;
@@ -336,7 +336,7 @@
 .progress-label span { height: 1px; flex: 1; background: #6e531f; }
 
 .simple-page { background: radial-gradient(circle at 50% 40%, #35130f, #050303 68%); }
-.hello-background {
+.dolly-background {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -345,8 +345,8 @@
 .simple-page .simple-shade { background: transparent; }
 .temp-page > img { width: 100%; height: 100%; object-fit: cover; }
 .temp-page .simple-shade { background: linear-gradient(180deg, #0008, transparent 20%, transparent 80%, #000a); }
-.simple-back { position: absolute; z-index: 3; top: max(20px, env(safe-area-inset-top)); left: 5%; }
-.hello-card {
+.simple-back { position: absolute; z-index: 3; top: max(20px, calc(env(safe-area-inset-top) + 8px)); left: 5%; }
+.dolly-card {
   position: absolute;
   z-index: 2;
   top: 50%;
@@ -359,11 +359,11 @@
   background: #100806e8;
   box-shadow: inset 0 0 0 4px #050302, 0 25px 80px #000;
 }
-.hello-card span,
+.dolly-card span,
 .temp-label { color: #c9a452; font: 700 9px Arial, sans-serif; letter-spacing: .18em; text-transform: uppercase; }
-.hello-card h2 { margin: 12px 0; color: #fff1c5; font-size: 34px; font-weight: 400; }
-.hello-card p { margin: 0 0 35px; color: #ad9d7d; font-size: 13px; }
-.temp-label { position: absolute; z-index: 2; bottom: 3%; left: 0; right: 0; text-align: center; text-shadow: 0 2px 8px #000; }
+.dolly-card h2 { margin: 12px 0; color: #fff1c5; font-size: 34px; font-weight: 400; }
+.dolly-card p { margin: 0 0 35px; color: #ad9d7d; font-size: 13px; }
+.temp-label { position: absolute; z-index: 2; bottom: max(3%, calc(env(safe-area-inset-bottom) + 8px)); left: 0; right: 0; text-align: center; text-shadow: 0 2px 8px #000; }
 
 .game-page { cursor: crosshair; background: #370009; }
 .game-background,
@@ -380,32 +380,35 @@
 .placed-object { z-index: 1; transition: opacity .12s ease; }
 .object-hidden { opacity: 0; }
 
+/* Game HUD: everything is sized from the frame width (--fw), so the top bar and
+   clue list always fit inside the red curtain band (top 22.4% of the frame)
+   on phones, tablets and short/wide desktop windows alike. */
+.game-page { --fw: min(100vw, 100svh * 0.460251); }
+
 .game-ui {
   position: absolute;
   z-index: 4;
   inset: 0 0 auto;
-  height: 26.6%;
-  padding-top: 1.4%;
+  height: calc(22.4% + env(safe-area-inset-top));
   background: linear-gradient(180deg, #270006aa, transparent 35%);
 }
 
 .game-topbar {
-  grid-template-columns: 44px 1fr 44px;
-  padding-top: max(4%, env(safe-area-inset-top));
+  grid-template-columns: calc(var(--fw) * .095) 1fr calc(var(--fw) * .095);
+  padding: max(calc(var(--fw) * .025), calc(env(safe-area-inset-top) + 4px)) 5% 0;
 }
-.game-topbar .round-button { width: clamp(34px, 9.5vw, 43px); }
-.game-heading { display: flex; flex-direction: column; gap: 2px; text-shadow: 0 2px 7px #270007; }
-.game-heading span { color: #ffe9aa; font-size: clamp(13px, 4vw, 18px); }
-.game-heading strong { color: #cbac71; font: 600 clamp(7px, 2vw, 10px) Arial, sans-serif; letter-spacing: .13em; text-transform: uppercase; }
+.game-topbar .round-button { width: calc(var(--fw) * .095); }
+.game-heading { display: flex; flex-direction: column; gap: calc(var(--fw) * .004); text-shadow: 0 2px 7px #270007; }
+.game-heading span { color: #ffe9aa; font-size: calc(var(--fw) * .045); }
+.game-heading strong { color: #cbac71; font: 600 calc(var(--fw) * .022) Arial, sans-serif; letter-spacing: .13em; text-transform: uppercase; }
 
 .clue-grid {
   display: grid;
-  grid-template-rows: repeat(4, 1fr);
+  grid-template-rows: repeat(4, calc(var(--fw) * .07));
   grid-auto-flow: column;
   grid-auto-columns: 1fr;
-  gap: 4px 8px;
-  height: 66%;
-  padding: 4% 6% 4%;
+  gap: calc(var(--fw) * .009) calc(var(--fw) * .02);
+  padding: calc(var(--fw) * .015) 6% 0;
 }
 
 .clue {
@@ -422,9 +425,9 @@
 
 .clue > span:last-of-type {
   overflow: hidden;
-  padding: 0 5px;
+  padding: 0 calc(var(--fw) * .013);
   color: #f5ddb1;
-  font: 600 clamp(7px, 2.2vw, 10px) Arial, sans-serif;
+  font: 600 calc(var(--fw) * .029) Arial, sans-serif;
   letter-spacing: .03em;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -432,9 +435,9 @@
 
 .object-icon {
   position: relative;
-  flex: 0 0 40px;
-  width: 40px;
-  height: 40px;
+  flex: 0 0 calc(var(--fw) * .07);
+  width: calc(var(--fw) * .07);
+  height: calc(var(--fw) * .07);
   overflow: hidden;
   filter: drop-shadow(0 0 5px #ffc94d99);
 }
@@ -470,7 +473,7 @@
 .board-instruction {
   position: absolute;
   z-index: 3;
-  top: 28%;
+  top: calc(28% + env(safe-area-inset-top));
   left: 50%;
   padding: 7px 14px;
   border: 1px solid #d9ae5844;
@@ -573,6 +576,55 @@
   100% { opacity: 0; }
 }
 @keyframes fadeIn { from { opacity: 0; } }
+
+/* Cleo intro: scene + hidden objects are already rendered underneath. */
+.game-ui { transition: opacity .45s ease; }
+.ui-waiting { opacity: 0; pointer-events: none; }
+
+.cleo-intro {
+  position: absolute;
+  z-index: 30;
+  inset: 0;
+  cursor: pointer;
+  overflow: hidden;
+  background: linear-gradient(180deg, #0a0204d9 0%, #0a020499 45%, #0a0204e6 100%);
+  transition: opacity .45s ease;
+}
+.intro-leaving { opacity: 0; pointer-events: none; }
+.intro-portrait,
+.intro-text {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  user-select: none;
+}
+/* 0.5s pause, then slide in from the left over 0.75s */
+.intro-portrait { animation: introSlide .75s .5s cubic-bezier(.2, .7, .3, 1) both; }
+/* 0.5s after the slide ends (1.75s), fade in over 0.5s; kept below the notch */
+.intro-text {
+  top: env(safe-area-inset-top);
+  height: calc(100% - env(safe-area-inset-top));
+  object-fit: contain;
+  object-position: top;
+  filter: drop-shadow(0 2px 6px #000);
+  animation: fadeIn .5s 1.75s ease both;
+}
+.intro-continue {
+  position: absolute;
+  bottom: max(2.5%, calc(env(safe-area-inset-bottom) + 8px));
+  left: 0;
+  right: 0;
+  color: #f0c862;
+  /* scale with the game frame's width so it looks the same on every screen */
+  font: 600 calc(min(100vw, 100svh * 0.460251) * 0.039) Arial, sans-serif;
+  letter-spacing: .08em;
+  text-align: center;
+  text-shadow: 0 1px 6px #000;
+  animation: fadeIn .5s 2.25s ease both;
+}
+@keyframes introSlide { from { transform: translateX(-100%); } }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; }
