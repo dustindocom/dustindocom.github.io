@@ -43,6 +43,8 @@ input{font-family:inherit}
 #screen.nonav{padding-bottom:0}
 #screen::-webkit-scrollbar,.hs::-webkit-scrollbar{display:none}
 .hs{scrollbar-width:none}
+@media (hover:hover) and (pointer:fine){.hs{cursor:grab}}
+.hs.dragging,.hs.dragging *{cursor:grabbing!important;user-select:none}
 h1,h2,h3{margin:0;font-family:var(--f-head);letter-spacing:-.01em}
 h2{font-size:18px;font-weight:600}
 .sec{padding-top:20px}

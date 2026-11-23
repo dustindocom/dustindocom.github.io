@@ -970,6 +970,33 @@ var Rows=(function(){
     e.preventDefault(); last.row=r;
     r.scrollLeft+=d;
   },{passive:false});
+  /* mouse click-and-drag scrolls a row sideways (touch already does this natively).
+     A press that moves less than 5px is still a click; after a real drag the click is swallowed. */
+  var drag=null,eatClick=false;
+  document.addEventListener('pointerdown',function(e){
+    if(e.pointerType!=='mouse'||e.button!==0) return;
+    var r=e.target.closest&&e.target.closest('.hs');
+    if(!r||r.scrollWidth<=r.clientWidth+1||e.target.closest('input,textarea,select')) return;
+    drag={r:r,x:e.clientX,s:r.scrollLeft,on:false};
+  });
+  window.addEventListener('pointermove',function(e){
+    if(!drag) return;
+    if(!(e.buttons&1)){endDrag();return}
+    var dx=e.clientX-drag.x;
+    if(!drag.on){ if(Math.abs(dx)<5) return; drag.on=true; drag.r.classList.add('dragging') }
+    e.preventDefault();
+    drag.r.scrollLeft=drag.s-dx;
+  });
+  function endDrag(){
+    if(!drag) return;
+    if(drag.on){ drag.r.classList.remove('dragging'); eatClick=true; setTimeout(function(){eatClick=false},0) }
+    drag=null;
+  }
+  window.addEventListener('pointerup',endDrag);
+  window.addEventListener('pointercancel',endDrag);
+  window.addEventListener('blur',endDrag);
+  window.addEventListener('click',function(e){ if(eatClick){eatClick=false;e.preventDefault();e.stopPropagation()} },true);
+  document.addEventListener('dragstart',function(e){ if(e.target.closest&&e.target.closest('.hs'))e.preventDefault() });
   return {save:save,restore:restore};
 })();
  
