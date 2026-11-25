@@ -297,6 +297,26 @@ renderer.toneMappingExposure = LOOK.exposure;
 renderer.setClearColor(color(LOOK.horizon), 1);
 root.insertBefore(canvas, root.firstChild);
 
+// Lite mode: when the browser draws 3D on the processor instead of the graphics card
+// (graphics acceleration off, energy saving, a blocked driver), start with the heavy extras off
+// so the scene runs smoothly instead of stuttering. Sharpness and smooth edges are kept.
+// Add ?lite=1 to the page address to force it on (to preview it), or ?lite=0 to force it off.
+var GPU_NAME = '', LITE = false;
+try {
+  var gl = renderer.getContext(), dbg = gl.getExtension('WEBGL_debug_renderer_info');
+  GPU_NAME = String(gl.getParameter(dbg ? dbg.UNMASKED_RENDERER_WEBGL : gl.RENDERER) || '');
+} catch (e) {}
+var liteParam = /[?&]lite=([01])/.exec(location.search);
+LITE = liteParam ? liteParam[1] === '1' : /swiftshader|llvmpipe|softpipe|software|basic render/i.test(GPU_NAME);
+if (LITE) {
+  Q.bloom = false;                              // the glow pass redraws the whole scene several times
+  Q.grassBlades = false;                        // tens of thousands of blades
+  Q.fuzzLayers = Math.min(Q.fuzzLayers, 3);     // fur is drawn once per layer; 3 still reads as fuzzy
+  Q.flowers = Math.round(Q.flowers * 0.6);
+  Q.sparkles = Math.min(Q.sparkles, 6);
+  Q.pixelRatio = Math.min(Q.pixelRatio, 1.5);   // still crisp; avoids drawing 4x the pixels on high-res screens
+}
+
 var scene = new T.Scene();
 var camera = new T.PerspectiveCamera(30, F.tilesWide / F.tilesHigh, 1, 400);
 camera.matrixAutoUpdate = false;
@@ -2129,12 +2149,12 @@ function applyCounts() {
 }
 // If the scene runs slowly, give things up in this order: grass blades, bloom, sharpness, then fuzz layers, flowers and sparkles.
 var fpsNow = 60;
-var mon = { warm: 50, frames: 0, time: 0, slow: 0, hiccups: 0, thinned: false, log: [] };
+var mon = { warm: 50, frames: 0, time: 0, slow: 0, hiccups: 0, thinned: false, log: LITE ? ['lite mode (' + (liteParam ? 'forced' : 'no graphics card') + ')'] : [] };
 function stepDown() {
   var what = null;
   if (Q.grassBlades && bladeMesh && bladeMesh.visible) { setBlades(false); what = 'grass blades off'; }
   else if (Q.bloom && composer) { setBloom(false); what = 'bloom off'; }
-  else if (renderer.getPixelRatio() > 1) { Q.pixelRatio = Math.max(1, renderer.getPixelRatio() - 0.5); resize(); what = 'pixel ratio ' + Q.pixelRatio; }
+  else if (renderer.getPixelRatio() > 1 && !LITE) { /* lite mode never trades sharpness for speed */ Q.pixelRatio = Math.max(1, renderer.getPixelRatio() - 0.5); resize(); what = 'pixel ratio ' + Q.pixelRatio; }
   else if (!mon.thinned) { mon.thinned = true; Q.flowers = Math.round(Q.flowers / 2); Q.sparkles = 0; applyCounts(); setFuzzLayers(Math.min(Q.fuzzLayers, 1)); what = 'less fuzz, fewer flowers'; }
   if (what) mon.log.push(what);
 }
@@ -2270,7 +2290,7 @@ function setParam(key, value) {
 
 // A small handle for experimenting from the browser console, e.g. DIORAMA.setGrassBlades(false)
 window.DIORAMA = {
-  config: CONFIG, quality: Q, log: mon.log, frozen: false,
+  config: CONFIG, quality: Q, log: mon.log, frozen: false, lite: LITE, gpu: GPU_NAME,
   setText: function (s) { input.value = String(s); syncText(); },
   setGrassBlades: setBlades, setBloom: setBloom,
   setPixelRatio: function (p) { Q.pixelRatio = p; resize(); },
